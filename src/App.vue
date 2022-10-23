@@ -7,15 +7,15 @@
   <div class="main">
 		<div class="wrapper">
 			<div class="header"><span id="multiplication" class="actionSign active">×</span> & <span id="division" class="actionSign">÷</span></div>
-			<div class="nums_holder">
-				<div class="numbers" id="n2">2</div>
-				<div class="numbers" id="n3">3</div>
-				<div class="numbers" id="n4">4</div>
-				<div class="numbers" id="n5">5</div>
-				<div class="numbers" id="n6">6</div>
-				<div class="numbers" id="n7">7</div>
-				<div class="numbers" id="n8">8</div>
-				<div class="numbers" id="n9">9</div>
+			<div class="nums_holder" v-if="numbersData.length != 0">
+				<div 
+					v-for="(numberItem, index) in numbersData" :key="index"
+					class="numbers"
+					@click="toggleNumber(index)"
+					:class="{active: numberItem.isEnabled}"
+				>
+					{{ numberItem.num }}
+				</div>
 				<div class="select_all_button">
 					<div class="squares"></div>
 					<div class="squares"></div>
@@ -81,6 +81,61 @@
 </template>
 
 <script>
+
+export default {
+  name: "App",
+	data() {
+		return {
+			numbersData: [],
+			enabledActions: [],
+			time: {
+				timeStart: null,
+				trainingDuration: 0
+			}
+		}
+	},
+	methods: {
+		start() {
+			checkActiveActions();
+			checkActiveNumbers();
+
+			// updateRangeValue();
+
+			// toggleButtons();
+			// toggleEquationArea();
+			// toggleAnswerTextVisibility();
+
+			// changeSignTo('submit');
+
+			// timeStart = new Date();
+
+			// equations = createEquationsList();
+			// maxPoints = equations.length;
+			// eqAmount = equations.length;
+
+			// answerText.focus();
+
+			// window.scrollTo({
+			// 		results: 80,
+			// 		behavior: "smooth"
+			// });
+		},
+		toggleNumber(index) {
+			this.numbersData[index].isEnabled = !this.numbersData[index].isEnabled;
+		}
+	},
+	mounted() {
+		let defaultNums = [2, 3, 4, 5, 6, 7, 8, 9];
+		for (let key in defaultNums) {
+			let num = defaultNums[key];
+			this.numbersData[key] = {num, isEnabled: false}
+			if (num == 2) {
+				this.numbersData[key].isEnabled = true;
+			}
+		}
+	},
+};
+
 let indexes = [];
 
 let actions = [];
@@ -126,7 +181,6 @@ let rangeLine, acceptButton;
 
 let trainingInProgress = false;
 
-let timeStart, trainingDuration;
 
 let firstEquation = true;
 
@@ -175,8 +229,6 @@ results_p1, results_p2, results_holder, results_eqAmount;
 rangeLine, acceptButton;
 
 trainingInProgress = false;
-
-timeStart, trainingDuration;
 
 firstEquation = true;
 activateButtons();
@@ -231,32 +283,6 @@ function resetData() {
 	toggleButtons();
 	trainingInProgress = false;
 	mistakesHeader.classList.remove('no_mistakes');
-}
-
-function start() {
-	checkActiveActions();
-	checkActiveNumbers();
-
-	updateRangeValue();
-
-	toggleButtons();
-	toggleEquationArea();
-	toggleAnswerTextVisibility();
-
-	changeSignTo('submit');
-
-	timeStart = new Date();
-
-	equations = createEquationsList();
-	maxPoints = equations.length;
-	eqAmount = equations.length;
-
-	answerText.focus();
-
-	window.scrollTo({
-	    results: 80,
-	    behavior: "smooth"
-	});
 }
 
 function doEquation() {
@@ -373,7 +399,7 @@ function openResults () {
 		return elemArr;
 	}
 
-	function createSection1 (arguments) {
+	function createSection1 () {
 		let sect = document.createElement('section');
 
 		let header = document.createElement('h2');
@@ -636,25 +662,6 @@ function toggleEquationArea() {
 	equationArea.classList.toggle('equation_area-active');
 }
 
-function checkActiveNumbers() {
-	let activeNumbers = document.querySelectorAll('.numbers.active');
-	if (activeNumbers.length == 0) {
-		let numbers = document.querySelectorAll('.numbers');
-		for (let elem of numbers) {
-			if (elem.innerHTML == 2) {
-				indexes[0] = 2;
-				elem.classList.add('active');
-				break;
-			}
-		}
-	} else {
-		indexes = [];
-		for (let elem of activeNumbers) {
-			indexes.push(elem.innerHTML);
-		}
-	}
-}
-
 function checkActiveActions() {
 	actions = [];
 	let activeActions = document.querySelectorAll('.actionSign.active');
@@ -681,7 +688,6 @@ function activateButtons() {
 
 	activateSelectAllButton();
 	activateActions();
-	activateNumbers();
 
 	function activateSelectAllButton() {
 		selectAllButton.addEventListener('click', function(e) {
@@ -724,20 +730,7 @@ function activateButtons() {
 		}
 	}
 	
-	function activateNumbers() {
-		for (let elem of numHolders) {
-			elem.addEventListener('click', function(e) {
-				this.classList.toggle('active');
-				let activeNumbers = document.querySelectorAll('.numbers.active');
-				if (activeNumbers.length == 8) {
-					selectAllButton.classList.add('active');
-				} else {
-					selectAllButton.classList.remove('active');
-				}
-				updateRangeValue();
-			});
-		}
-	}
+	updateRangeValue();
 
 }
 
