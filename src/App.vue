@@ -6,7 +6,21 @@
   <router-view /> -->
   <div class="main">
 		<div class="wrapper">
-			<div class="header"><span id="multiplication" class="actionSign active">×</span> & <span id="division" class="actionSign">÷</span></div>
+			<div class="header">
+				<span 
+					id="multiplication" 
+					class="actionSign"
+					:class="{active: operationsData.multiplication}"
+					@click="toggleOperation('multiplication')"
+				>×</span> 
+				& 
+				<span 
+					id="division" 
+					class="actionSign"
+					:class="{active: operationsData.division}"
+					@click="toggleOperation('division')"
+				>÷</span>
+			</div>
 			<div class="nums_holder" v-if="numbersData.length != 0">
 				<div 
 					v-for="(numberItem, index) in numbersData" :key="index"
@@ -87,7 +101,7 @@ export default {
 	data() {
 		return {
 			numbersData: [],
-			enabledActions: [],
+			operationsData: {},
 			time: {
 				timeStart: null,
 				trainingDuration: 0
@@ -122,9 +136,20 @@ export default {
 		},
 		toggleNumber(index) {
 			this.numbersData[index].isEnabled = !this.numbersData[index].isEnabled;
+		},
+		toggleOperation(op) {
+			this.operationsData[op] = !this.operationsData[op];
+			if (!Object.values(this.operationsData).some(value => value)) {
+				if (op == 'multiplication') {
+					this.operationsData['division'] = true;
+				} else {
+					this.operationsData['multiplication'] = true;
+				}
+			}
 		}
 	},
 	mounted() {
+		// set nums data
 		let defaultNums = [2, 3, 4, 5, 6, 7, 8, 9];
 		for (let key in defaultNums) {
 			let num = defaultNums[key];
@@ -132,6 +157,11 @@ export default {
 			if (num == 2) {
 				this.numbersData[key].isEnabled = true;
 			}
+		}
+		// set operations data
+		this.operationsData = {
+			multiplication: true,
+			division: false
 		}
 	},
 };
@@ -687,7 +717,6 @@ function getActiveCoefficient () {
 function activateButtons() {
 
 	activateSelectAllButton();
-	activateActions();
 
 	function activateSelectAllButton() {
 		selectAllButton.addEventListener('click', function(e) {
@@ -711,24 +740,7 @@ function activateButtons() {
 			}, 50);
 		}
 	}
-	
-	function activateActions() {
-		for (let elem of actionHolders) {
-			elem.addEventListener('click', function(e) {
-				lastActiveAction = this;
-				this.classList.toggle('active');
-				let activeActions = document.querySelectorAll('.actionSign.active');
-				if (activeActions.length == 0) {
-					if (lastActiveAction == multAction) {
-						divisAction.classList.add('active');
-					} else {
-						multAction.classList.add('active');
-					}
-				}
-				updateRangeValue();
-			});
-		}
-	}
+
 	
 	updateRangeValue();
 
