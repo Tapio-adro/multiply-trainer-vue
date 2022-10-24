@@ -30,7 +30,11 @@
 				>
 					{{ numberItem.num }}
 				</div>
-				<div class="select_all_button">
+				<div 
+					class="select_all_button"
+					@click="toggleAllNumbers()"
+					ref="toggleNumbersButton"
+				>
 					<div class="squares"></div>
 					<div class="squares"></div>
 					<div class="squares"></div>
@@ -113,7 +117,7 @@ export default {
 			checkActiveActions();
 			checkActiveNumbers();
 
-			// updateRangeValue();
+			updateRangeValue();
 
 			// toggleButtons();
 			// toggleEquationArea();
@@ -146,6 +150,28 @@ export default {
 					this.operationsData['multiplication'] = true;
 				}
 			}
+		},
+		toggleAllNumbers() {
+			let button = this.$refs.toggleNumbersButton;
+			console.log(button);
+			let that = this;
+
+			button.classList.toggle('active');
+			
+			console.log(that.numbersData);
+			let nums = [2, 3, 4, 5, 6, 7, 8, 9];
+			let curInterval = setInterval(function() {
+				let num = nums.shift();
+				let numItem = that.numbersData[num - 2];
+				if (button.classList.contains('active')) {
+					numItem.isEnabled = true;
+				} else {
+					numItem.isEnabled = false;
+				}
+				if (nums.length == 0) {
+					clearInterval(curInterval);
+				}
+			}, 50);
 		}
 	},
 	mounted() {
@@ -715,33 +741,8 @@ function getActiveCoefficient () {
 }
 
 function activateButtons() {
-
-	activateSelectAllButton();
-
-	function activateSelectAllButton() {
-		selectAllButton.addEventListener('click', function(e) {
-			selectAllButton.classList.toggle('active');
-			changeSelectionOfAllNumbers();
-		});
-		function changeSelectionOfAllNumbers() {
-			let nums = [2, 3, 4, 5, 6, 7, 8, 9];
-			let curInterval = setInterval(function() {
-				let num = nums.shift();
-				let elem = document.querySelector('#n' + num);
-				if (selectAllButton.classList.contains('active')) {
-					elem.classList.add('active');
-				} else {
-					elem.classList.remove('active');
-				}
-				updateRangeValue();
-				if (nums.length == 0) {
-					clearInterval(curInterval);
-				}
-			}, 50);
-		}
-	}
-
-	
+	updateRangeValue();
+	updateRangeValue();
 	updateRangeValue();
 
 }
