@@ -21,7 +21,7 @@
 					@click="toggleOperation('division')"
 				>÷</span>
 			</div>
-			<div class="nums_holder" v-if="numbersData.length != 0">
+			<div class="nums_holder">
 				<div 
 					v-for="(numberItem, index) in numbersData" :key="index"
 					class="numbers"
@@ -41,8 +41,11 @@
 					<div class="squares"></div>
 				</div>
 			</div>
-			<input type="range" class="range" min="0" max="4" step="1" value="2">
-			<div class="range_value">0</div>
+			<input type="range" class="range" min="0" max="4" step="1" value="2"
+				ref="range"
+				@input="updateEquationsAmount()"
+			>
+			<div class="range_value">{{ equationsAmount }}</div>
 			<div class="equation_area">
 				<div class="equation_text"></div>
 				<input type="number" class="answer_text hiden">
@@ -109,7 +112,8 @@ export default {
 			time: {
 				timeStart: null,
 				trainingDuration: 0
-			}
+			},
+			equationsAmount: 0
 		}
 	},
 	methods: {
@@ -138,9 +142,6 @@ export default {
 			// 		behavior: "smooth"
 			// });
 		},
-		toggleNumber(index) {
-			this.numbersData[index].isEnabled = !this.numbersData[index].isEnabled;
-		},
 		toggleOperation(op) {
 			this.operationsData[op] = !this.operationsData[op];
 			if (!Object.values(this.operationsData).some(value => value)) {
@@ -150,6 +151,11 @@ export default {
 					this.operationsData['multiplication'] = true;
 				}
 			}
+			this.updateEquationsAmount();
+		},
+		toggleNumber(index) {
+			this.numbersData[index].isEnabled = !this.numbersData[index].isEnabled;
+			this.updateEquationsAmount();
 		},
 		toggleAllNumbers() {
 			let button = this.$refs.toggleNumbersButton;
@@ -158,7 +164,6 @@ export default {
 
 			button.classList.toggle('active');
 			
-			console.log(that.numbersData);
 			let nums = [2, 3, 4, 5, 6, 7, 8, 9];
 			let curInterval = setInterval(function() {
 				let num = nums.shift();
@@ -168,10 +173,23 @@ export default {
 				} else {
 					numItem.isEnabled = false;
 				}
+				that.updateEquationsAmount();
 				if (nums.length == 0) {
 					clearInterval(curInterval);
 				}
 			}, 50);
+		},
+		updateEquationsAmount() {
+			let rangeValues = [0.25, 0.5, 1, 2, 4];
+
+			let enabledNumbersAmount = this.numbersData.filter(num => num.isEnabled).length;
+
+			let enabledOperationsAmount = 0;
+			enabledOperationsAmount += this.operationsData.division ? 1 : 0;
+			enabledOperationsAmount += this.operationsData.multiplication ? 1 : 0;
+
+			let defaultAmount = enabledNumbersAmount * enabledOperationsAmount * 8;
+			this.equationsAmount = rangeValues[this.$refs.range.value] * defaultAmount;
 		}
 	},
 	mounted() {
@@ -198,7 +216,6 @@ let actions = [];
 
 let defaultNums = [2, 3, 4, 5, 6, 7, 8, 9];
 // defaultNums = [2];
-let rangeValues = [0.25, 0.5, 1, 2, 4];
 
 let equations = [];
 
@@ -248,8 +265,6 @@ indexes = [];
 actions = [];
 
 defaultNums = [2, 3, 4, 5, 6, 7, 8, 9];
-// defaultNums = [2];
-rangeValues = [0.25, 0.5, 1, 2, 4];
 
 equations = [];
 
@@ -287,7 +302,6 @@ rangeLine, acceptButton;
 trainingInProgress = false;
 
 firstEquation = true;
-activateButtons();
 
 sign.addEventListener('click', function(e) {
 	checkInputs();
@@ -298,10 +312,6 @@ document.addEventListener('keydown', function(e) {
 		checkInputs();
 	}
 });
-
-range.oninput = function() {
-	updateRangeValue();
-}
 
 answerText.addEventListener('keyup', function(e) {
 	if (answerText.value.length > 2) {
@@ -424,10 +434,7 @@ function hideElementsAndShowResult() {
 
 // functions
 
-function updateRangeValue () {
-	let defaultAmount = getActiveCoefficient() * 8;
-	rangeValue.innerHTML = rangeValues[range.value] * defaultAmount;
-}
+
 
 function openResults () {
 
@@ -724,27 +731,6 @@ function checkActiveActions() {
 	for (let elem of activeActions) {
 		actions.push(elem.innerHTML);
 	}
-}
-
-function getActiveCoefficient () {
-	let activeNumbers = document.querySelectorAll('.numbers.active');
-	let numAmount = 0;
-	activeNumbers.forEach(() => numAmount++);
-
-	let activeActions = document.querySelectorAll('.actionSign.active');
-	let actAmount = 0;
-	activeActions.forEach(() => actAmount++);
-
-	// console.log(numAmount, actAmount);
-
-	return numAmount * actAmount;
-}
-
-function activateButtons() {
-	updateRangeValue();
-	updateRangeValue();
-	updateRangeValue();
-
 }
 
 function createEquationsList() {
