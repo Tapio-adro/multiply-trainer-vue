@@ -44,14 +44,14 @@
 				</div>
 				<input type="range" class="range" min="0" max="4" step="1" value="2"
 					ref="range"
-					@input="updateEquationsAmount()"
+					@input="refreshEquationsAmount()"
 				>
 				<div class="range_value">{{ equationsAmount }}</div>
 			</div>
 			<div class="equation_area" ref="equationArea">
-				<div class="equation_text"></div>
-				<input type="number" class="answer_text hiden" ref="answerText">
-				<div class="sign start" @click="checkEnterInput" ref="sign">
+				<div class="equation_text" ref="equationText">{{ equationText }}</div>
+				<input type="number" class="answer_text hiden" ref="answerInput">
+				<div class="sign start" @click="processEnterInput" ref="sign">
 					<div id="sign_start"></div>
 				</div>
 			</div>
@@ -70,7 +70,7 @@
 	</div>
 	<div class="darkBg"></div>
 
-	<div id="buttons_holder">
+	<!-- <div id="buttons_holder">
 		<div id="ref_button" class="top_button">?</div>
 		<div id="colors_container" class="top_button">
 			<div class="color_container" style="background-color: #66ff66"></div>
@@ -89,7 +89,7 @@
 				<div id="shrink_link_container"></div>
 			</div>
 		</div>
-	</div>
+	</div> -->
 	<div class="ref_wrapper hiden">
 		<div class="ref_content">
 			<section>
@@ -104,6 +104,8 @@
 </template>
 
 <script>
+import { thisExpression } from '@babel/types';
+
 
 export default {
   name: "App",
@@ -119,7 +121,9 @@ export default {
 			},
 			equationsAmount: 0,
 			trainingInProgress: false,
-			equations: []
+			equations: [],
+			curEquation: {},
+			equationText: ''
 		}
 	},
 	methods: {
@@ -128,19 +132,19 @@ export default {
 
 			this.$refs.equationArea.classList.toggle('equation_area-active');
 
-			this.toggleAnswerText();
+			this.toggleAnswerInput();
 
 			this.changeSignTo('submit');
 
 			this.time.timeStart = new Date();
 
-			this.checkInputValues();
+			this.prepareInputValues();
 			this.equations = createEquationsList(...this.inputValues);
-			console.log(this.equations);
+
 			// maxPoints = equations.length;
 			// eqAmount = equations.length;
 
-			// answerText.focus();
+			// answerInput.focus();
 
 			// window.scrollTo({
 			// 		results: 80,
@@ -156,15 +160,14 @@ export default {
 					this.operationsData['multiplication'] = true;
 				}
 			}
-			this.updateEquationsAmount();
+			this.refreshEquationsAmount();
 		},
 		toggleNumber(index) {
 			this.numbersData[index].isEnabled = !this.numbersData[index].isEnabled;
-			this.updateEquationsAmount();
+			this.refreshEquationsAmount();
 		},
 		toggleAllNumbers() {
 			let button = this.$refs.toggleNumbersButton;
-			console.log(button);
 			let that = this;
 
 			button.classList.toggle('active');
@@ -178,13 +181,13 @@ export default {
 				} else {
 					numItem.isEnabled = false;
 				}
-				that.updateEquationsAmount();
+				that.refreshEquationsAmount();
 				if (nums.length == 0) {
 					clearInterval(curInterval);
 				}
 			}, 50);
 		},
-		updateEquationsAmount() {
+		refreshEquationsAmount() {
 			let rangeValues = [0.25, 0.5, 1, 2, 4];
 			this.rangeData.coefficient = rangeValues[this.$refs.range.value];
 
@@ -197,11 +200,11 @@ export default {
 			let defaultAmount = enabledNumbersAmount * enabledOperationsAmount * 8;
 			this.equationsAmount = rangeValues[this.$refs.range.value] * defaultAmount;
 		},
-		checkEnterInput() {
+		processEnterInput() {
 			if (!this.trainingInProgress){
 				this.trainingInProgress = true;
 				this.start();
-				// doEquation();
+				this.showNextEquation();
 			} else if (sign.classList.contains('submit')) {
 				checkAnswer();
 			} else if (resultsElem.classList.contains("full")) {
@@ -210,14 +213,14 @@ export default {
 				resetData();	
 			}
 		},
-		toggleAnswerText(mode) {
-			let answerText = this.$refs.answerText;
-			answerText.classList.toggle('hiden');
+		toggleAnswerInput(mode) {
+			let answerInput = this.$refs.answerInput;
+			answerInput.classList.toggle('hiden');
 			if (mode == 'none') {
 				setTimeout(() => {
-					answerText.classList.toggle('none');
+					answerInput.classList.toggle('none');
 					setTimeout(() => {
-						answerText.classList.toggle('none');
+						answerInput.classList.toggle('none');
 					}, 500)
 				}, 500)
 			}
@@ -247,12 +250,17 @@ export default {
 					break;
 			}
 		},
-		checkInputValues() {
+		prepareInputValues() {
 			let numbers = [];
 			for (let numItem of this.numbersData) {
 				if (numItem.isEnabled) {
 					numbers.push(numItem.num);
 				}
+			}
+			if (numbers.length == 0) {
+				numbers = [2];
+				this.numbersData[0].isEnabled = true;
+				this.refreshEquationsAmount();
 			}
 			let operations = [];
 			if (this.operationsData.multiplication) {
@@ -263,6 +271,34 @@ export default {
 			}
 			let coefficient = this.rangeData.coefficient;
 			this.inputValues = [numbers, operations, coefficient];
+		},
+		showNextEquation() {
+			this.$refs.answerInput.value = '';
+			this.curEquation = this.equations.pop();
+			let equationString = getEquationString(this.curEquation);
+			if (this.curEquation.isFirst) {
+				this.showFirstEquation(equationString)
+				return;
+			}
+			this.changeEquationText(equationString);
+		},
+		showFirstEquation(equationString) {
+			let chars = equationString.split('');
+			let that = this;
+			let interval = setInterval(function() {
+				that.equationText += chars.shift();
+				if (chars.length == 0) {
+					clearInterval(interval);
+				}
+			}, 10);
+		},
+		changeEquationText(str) {
+			this.$refs.equationText.classList.add('hiden');
+			let that = this;
+			setTimeout(function() {
+				that.equationText = str;
+				that.$refs.equationText.classList.remove('hiden');
+			}, 250);
 		}
 	},
 	mounted() {
@@ -280,6 +316,8 @@ export default {
 			multiplication: true,
 			division: false
 		}
+
+		this.refreshEquationsAmount();
 	},
 };
 
@@ -300,7 +338,7 @@ let main;
 let numHolders;
 let actionHolders;
 let equationText;
-let answerText;
+let answerInput;
 let equationArea;
 let mistakesArea;
 let mistakesHeader;
@@ -340,7 +378,7 @@ main = document.querySelector('.main');
 numHolders = document.querySelectorAll('.numbers');
 actionHolders = document.querySelectorAll('.actionSign');
 equationText = document.querySelector('.equation_text');
-answerText = document.querySelector('.answer_text');
+answerInput = document.querySelector('.answer_text');
 equationArea = document.querySelector('.equation_area');
 mistakesArea = document.querySelector('.mistakes_area');
 mistakesHeader = document.querySelector('.mistakes_header');
@@ -359,9 +397,9 @@ trainingInProgress = false;
 
 firstEquation = true;
 
-answerText.addEventListener('keyup', function(e) {
-	if (answerText.value.length > 2) {
-		answerText.value = answerText.value.substr(0, 2);
+answerInput.addEventListener('keyup', function(e) {
+	if (answerInput.value.length > 2) {
+		answerInput.value = answerInput.value.substr(0, 2);
 	}
 });
 }, 1000)
@@ -384,20 +422,9 @@ function resetData() {
 	mistakesHeader.classList.remove('no_mistakes');
 }
 
-function doEquation() {
-	answerText.value = '';
-	equation = equations.pop();
-	let equationString = getEquationString(equation);
-	if (firstEquation) {
-		firstEquation = false;
-		showFirstEquation(equationString)
-		return;
-	}
-	changeEquationText(equationString);
-} 
 
 function checkAnswer() {
-	let answerString = answerText.value;
+	let answerString = answerInput.value;
 	if (!answerString) {
 		return;
 	} else if (answerString == equation.answer) {
@@ -425,7 +452,7 @@ function checkAnswer() {
 
 	rangeValue.innerHTML = eqAmount;
 
-	answerText.focus();
+	answerInput.focus();
 
 	if (equations.length > 0) {
 		doEquation();
@@ -684,27 +711,102 @@ function checkNoMistakes() {
 }
 
 
+let colorButton;
+let colorsHolder;
+let colorButtons;
+let shrinkLink;
+let linkToFractionButton;
+let linkToMainButton;
+let refButton;
+let refWrapper;
 
-function getEquationString(equation, mode='default') {
-	modes = {
-		default: function(equation) {
-			return equation.num1 + ' ' + equation.sign + ' ' + equation.num2 + ' = ';
-		},
-		full: function(equation) {
-			return equation.num1 + ' ' + equation.sign + ' ' + equation.num2 + ' = ' + equation.answer;
-		}
+let canChangeColor = false;
+
+setTimeout(() => {
+	colorButton = document.querySelector('#color_button');
+	colorsHolder = document.querySelector('#colors_container');
+	colorButtons = document.querySelectorAll('.color_container');
+	shrinkLink = document.querySelector('#shrink_link_wrapper');
+	linkToFractionButton = document.querySelector('#linkToFraction');
+	linkToMainButton = document.querySelector('#linkToMain');
+	refButton = document.querySelector('#ref_button');
+	refWrapper = document.querySelector('.ref_wrapper');
+	activateColorButtons();
+	// if (linkToFractionButton) {
+	// 	linkToFractionButton.addEventListener('click', ev => {
+	// 		if (linkToFractionButton.classList.contains('active')) {
+	// 			window.location.href = "./fraction/index.html";
+	// 		} else {
+	// 			linkToFractionButton.classList.add('active');
+	// 			linkToFractionButton.innerHTML = 'Тренажер дробів';
+	// 			shrinkLink.classList.remove('hiden');
+	// 		}
+	// 	})
+	// 	shrinkLink.addEventListener('click', ev => {
+	// 		if (!shrinkLink.classList.contains('hiden')) {
+	// 			shrinkLink.classList.add('hiden');
+	// 			linkToFractionButton.innerHTML = '<div class="fract"> <div class="numer">1</div> <div class="denom" style="border-top: 2px solid rgb(0, 0, 0)">2</div> </div>';
+	// 			linkToFractionButton.classList.remove('active');
+	// 		}
+	// 	})
+	// } else {
+	// 	linkToMainButton.addEventListener('click', ev => {
+	// 		if (linkToMainButton.classList.contains('active')) {
+	// 			window.location.href = "../index.html";
+	// 		} else {
+	// 			linkToMainButton.classList.add('active');
+	// 			linkToMainButton.innerHTML = 'Тренажер множення';
+	// 			shrinkLink.classList.remove('hiden');
+	// 		}
+	// 	})
+	// 	shrinkLink.addEventListener('click', ev => {
+	// 		if (!shrinkLink.classList.contains('hiden')) {
+	// 			shrinkLink.classList.add('hiden');
+	// 			linkToMainButton.innerHTML = '2 × 2';
+	// 			linkToMainButton.classList.remove('active');
+	// 		}
+	// 	})
+	// }
+	// refButton.addEventListener('click', ev => {
+	// 	refButton.classList.toggle('active');
+	// 	refWrapper.classList.toggle('hiden');
+	// })
+	
+	
+	
+	// document.addEventListener('keydown', function(e) {
+	// if (refButton.classList.contains('active') && e.key == 'Escape') {
+	// 	refButton.classList.toggle('active');
+	// 	refWrapper.classList.toggle('hiden');	
+	// 	}
+	// });
+	
+	// colorsHolder.addEventListener('click', ev => {
+	// 	if (!canChangeColor) {
+	// 		colorsHolder.classList.toggle('active');
+	// 		setTimeout(() => {
+	// 			canChangeColor = true;
+	// 		}, 500)
+	// 	}
+	// })
+}, 1000)
+
+function activateColorButtons () {
+	for (let button of colorButtons) {
+		button.addEventListener('click', ev => {
+			if (canChangeColor) {
+				let color = button.style.backgroundColor;
+				document.documentElement.style.setProperty('--green', color);
+				colorsHolder.classList.toggle('active');
+				setTimeout(() => {
+					canChangeColor = false;
+				}, 0)
+			}
+		})
 	}
-	return modes[mode](equation);
 }
 
-function changeEquationText(str) {
-	equationText.classList.add('hiden');
-	setTimeout(function() {
-		equationText.innerHTML = str;
-		equationText.classList.remove('hiden');
-	}, 250);
-}
-
+// external functions
 
 function createEquationsList(indexes, actions, coefficient) {
 	let defaultNums = [2, 3, 4, 5, 6, 7, 8, 9];
@@ -717,9 +819,9 @@ function createEquationsList(indexes, actions, coefficient) {
 
 	checkSmallerCoefficient();
 
+	result[result.length - 1].isFirst = true;
+
 	return result;
-
-
 
 	function generateBaseArray() {
 		let result = [];
@@ -731,7 +833,8 @@ function createEquationsList(indexes, actions, coefficient) {
 						num2: index, 
 						answer: num * index, 
 						type: 'normal',
-						sign: '×'});
+						sign: '×',
+						isFirst: false});
 				}
 				if (actions.indexOf('÷') != -1) {
 					result.push({
@@ -739,7 +842,8 @@ function createEquationsList(indexes, actions, coefficient) {
 						num2: index, 
 						answer: num, 
 						type: 'normal',
-						sign: '÷'});
+						sign: '÷',
+						isFirst: false});
 				}	
 			}
 		}
@@ -776,116 +880,17 @@ function createEquationsList(indexes, actions, coefficient) {
 		return Math.floor(Math.random() * arr.length);
 	}
 }
-
-function showFirstEquation(equationString) {
-	let chars = equationString.split('');
-	let funcInterval = setInterval(function() {
-		equationText.innerHTML += chars.shift();
-		if (chars.length == 0) {
-			clearInterval(funcInterval);
+function getEquationString(equation, mode='default') {
+	let modes = {
+		default: function(equation) {
+			return equation.num1 + ' ' + equation.sign + ' ' + equation.num2 + ' = ';
+		},
+		full: function(equation) {
+			return equation.num1 + ' ' + equation.sign + ' ' + equation.num2 + ' = ' + equation.answer;
 		}
-	}, 10);
+	}
+	return modes[mode](equation);
 }
 
-let colorButton;
-let colorsHolder;
-let colorButtons;
-let shrinkLink;
-let linkToFractionButton;
-let linkToMainButton;
-let refButton;
-let refWrapper;
-
-let canChangeColor = false;
-
-setTimeout(() => {
-	colorButton = document.querySelector('#color_button');
-	colorsHolder = document.querySelector('#colors_container');
-	colorButtons = document.querySelectorAll('.color_container');
-	shrinkLink = document.querySelector('#shrink_link_wrapper');
-	linkToFractionButton = document.querySelector('#linkToFraction');
-	linkToMainButton = document.querySelector('#linkToMain');
-	refButton = document.querySelector('#ref_button');
-	refWrapper = document.querySelector('.ref_wrapper');
-	activateColorButtons();
-	if (linkToFractionButton) {
-		linkToFractionButton.addEventListener('click', ev => {
-			if (linkToFractionButton.classList.contains('active')) {
-				window.location.href = "./fraction/index.html";
-			} else {
-				linkToFractionButton.classList.add('active');
-				linkToFractionButton.innerHTML = 'Тренажер дробів';
-				shrinkLink.classList.remove('hiden');
-			}
-		})
-		shrinkLink.addEventListener('click', ev => {
-			if (!shrinkLink.classList.contains('hiden')) {
-				shrinkLink.classList.add('hiden');
-				linkToFractionButton.innerHTML = '<div class="fract"> <div class="numer">1</div> <div class="denom" style="border-top: 2px solid rgb(0, 0, 0)">2</div> </div>';
-				linkToFractionButton.classList.remove('active');
-			}
-		})
-	} else {
-		linkToMainButton.addEventListener('click', ev => {
-			if (linkToMainButton.classList.contains('active')) {
-				window.location.href = "../index.html";
-			} else {
-				linkToMainButton.classList.add('active');
-				linkToMainButton.innerHTML = 'Тренажер множення';
-				shrinkLink.classList.remove('hiden');
-			}
-		})
-		shrinkLink.addEventListener('click', ev => {
-			if (!shrinkLink.classList.contains('hiden')) {
-				shrinkLink.classList.add('hiden');
-				linkToMainButton.innerHTML = '2 × 2';
-				linkToMainButton.classList.remove('active');
-			}
-		})
-	}
-	refButton.addEventListener('click', ev => {
-		refButton.classList.toggle('active');
-		refWrapper.classList.toggle('hiden');
-	})
-	
-	
-	
-	document.addEventListener('keydown', function(e) {
-	if (refButton.classList.contains('active') && e.key == 'Escape') {
-		refButton.classList.toggle('active');
-		refWrapper.classList.toggle('hiden');	
-		}
-	});
-	
-	colorsHolder.addEventListener('click', ev => {
-		if (!canChangeColor) {
-			console.log('2');
-			colorsHolder.classList.toggle('active');
-			setTimeout(() => {
-				canChangeColor = true;
-			}, 500)
-		}
-	})
-}, 1000)
-
-
-
-
-
-
-function activateColorButtons () {
-	for (let button of colorButtons) {
-		button.addEventListener('click', ev => {
-			console.log('1');
-			if (canChangeColor) {
-				let color = button.style.backgroundColor;
-				document.documentElement.style.setProperty('--green', color);
-				colorsHolder.classList.toggle('active');
-				setTimeout(() => {
-					canChangeColor = false;
-				}, 0)
-			}
-		})
-	}
-}
 </script>
+
