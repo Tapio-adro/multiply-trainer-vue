@@ -6,50 +6,52 @@
   <router-view /> -->
   <div class="main">
 		<div class="wrapper">
-			<div class="header">
-				<span 
-					id="multiplication" 
-					class="actionSign"
-					:class="{active: operationsData.multiplication}"
-					@click="toggleOperation('multiplication')"
-				>×</span> 
-				& 
-				<span 
-					id="division" 
-					class="actionSign"
-					:class="{active: operationsData.division}"
-					@click="toggleOperation('division')"
-				>÷</span>
-			</div>
-			<div class="nums_holder">
-				<div 
-					v-for="(numberItem, index) in numbersData" :key="index"
-					class="numbers"
-					@click="toggleNumber(index)"
-					:class="{active: numberItem.isEnabled}"
-				>
-					{{ numberItem.num }}
+			<div id="input_elems" ref="inputElems">
+				<div class="header">
+					<span 
+						id="multiplication" 
+						class="actionSign"
+						:class="{active: operationsData.multiplication}"
+						@click="toggleOperation('multiplication')"
+					>×</span> 
+					& 
+					<span 
+						id="division" 
+						class="actionSign"
+						:class="{active: operationsData.division}"
+						@click="toggleOperation('division')"
+					>÷</span>
 				</div>
-				<div 
-					class="select_all_button"
-					@click="toggleAllNumbers()"
-					ref="toggleNumbersButton"
-				>
-					<div class="squares"></div>
-					<div class="squares"></div>
-					<div class="squares"></div>
-					<div class="squares"></div>
+				<div class="nums_holder">
+					<div 
+						v-for="(numberItem, index) in numbersData" :key="index"
+						class="numbers"
+						@click="toggleNumber(index)"
+						:class="{active: numberItem.isEnabled}"
+					>
+						{{ numberItem.num }}
+					</div>
+					<div 
+						class="select_all_button"
+						@click="toggleAllNumbers()"
+						ref="toggleNumbersButton"
+					>
+						<div class="squares"></div>
+						<div class="squares"></div>
+						<div class="squares"></div>
+						<div class="squares"></div>
+					</div>
 				</div>
+				<input type="range" class="range" min="0" max="4" step="1" value="2"
+					ref="range"
+					@input="updateEquationsAmount()"
+				>
+				<div class="range_value">{{ equationsAmount }}</div>
 			</div>
-			<input type="range" class="range" min="0" max="4" step="1" value="2"
-				ref="range"
-				@input="updateEquationsAmount()"
-			>
-			<div class="range_value">{{ equationsAmount }}</div>
-			<div class="equation_area">
+			<div class="equation_area" ref="equationArea">
 				<div class="equation_text"></div>
-				<input type="number" class="answer_text hiden">
-				<div class="sign start">
+				<input type="number" class="answer_text hiden" ref="answerText">
+				<div class="sign start" @click="checkEnterInput" ref="sign">
 					<div id="sign_start"></div>
 				</div>
 			</div>
@@ -109,29 +111,32 @@ export default {
 		return {
 			numbersData: [],
 			operationsData: {},
+			rangeData: {},
+			inputValues: [],
 			time: {
 				timeStart: null,
 				trainingDuration: 0
 			},
-			equationsAmount: 0
+			equationsAmount: 0,
+			trainingInProgress: false,
+			equations: []
 		}
 	},
 	methods: {
 		start() {
-			checkActiveActions();
-			checkActiveNumbers();
+			this.$refs.inputElems.classList.add('inactive');
 
-			updateRangeValue();
+			this.$refs.equationArea.classList.toggle('equation_area-active');
 
-			// toggleButtons();
-			// toggleEquationArea();
-			// toggleAnswerTextVisibility();
+			this.toggleAnswerText();
 
-			// changeSignTo('submit');
+			this.changeSignTo('submit');
 
-			// timeStart = new Date();
+			this.time.timeStart = new Date();
 
-			// equations = createEquationsList();
+			this.checkInputValues();
+			this.equations = createEquationsList(...this.inputValues);
+			console.log(this.equations);
 			// maxPoints = equations.length;
 			// eqAmount = equations.length;
 
@@ -181,6 +186,7 @@ export default {
 		},
 		updateEquationsAmount() {
 			let rangeValues = [0.25, 0.5, 1, 2, 4];
+			this.rangeData.coefficient = rangeValues[this.$refs.range.value];
 
 			let enabledNumbersAmount = this.numbersData.filter(num => num.isEnabled).length;
 
@@ -190,6 +196,73 @@ export default {
 
 			let defaultAmount = enabledNumbersAmount * enabledOperationsAmount * 8;
 			this.equationsAmount = rangeValues[this.$refs.range.value] * defaultAmount;
+		},
+		checkEnterInput() {
+			if (!this.trainingInProgress){
+				this.trainingInProgress = true;
+				this.start();
+				// doEquation();
+			} else if (sign.classList.contains('submit')) {
+				checkAnswer();
+			} else if (resultsElem.classList.contains("full")) {
+				closeResults();
+			} else if (sign.classList.contains('reload')) {
+				resetData();	
+			}
+		},
+		toggleAnswerText(mode) {
+			let answerText = this.$refs.answerText;
+			answerText.classList.toggle('hiden');
+			if (mode == 'none') {
+				setTimeout(() => {
+					answerText.classList.toggle('none');
+					setTimeout(() => {
+						answerText.classList.toggle('none');
+					}, 500)
+				}, 500)
+			}
+		},
+		changeSignTo(type) {
+			let sign = this.$refs.sign;
+			switch (type) {
+				case 'start':
+					sign.setAttribute('class', 'sign');
+					sign.classList.add(type);
+					sign.innerHTML = '<div id="sign_start"></div>';
+					break;
+				case 'submit':
+					sign.setAttribute('class', 'sign');
+					sign.classList.add(type);
+					sign.innerHTML = '⇨';
+					break;
+				case 'hiden':
+					sign.setAttribute('class', 'sign');
+					sign.classList.add(type);
+					sign.innerHTML = '';
+					break;
+				case 'reload':
+					sign.setAttribute('class', 'sign');
+					sign.classList.add('reload');
+					sign.innerHTML = '↻';
+					break;
+			}
+		},
+		checkInputValues() {
+			let numbers = [];
+			for (let numItem of this.numbersData) {
+				if (numItem.isEnabled) {
+					numbers.push(numItem.num);
+				}
+			}
+			let operations = [];
+			if (this.operationsData.multiplication) {
+				operations.push('×');
+			}
+			if (this.operationsData.division) {
+				operations.push('÷');
+			}
+			let coefficient = this.rangeData.coefficient;
+			this.inputValues = [numbers, operations, coefficient];
 		}
 	},
 	mounted() {
@@ -210,14 +283,6 @@ export default {
 	},
 };
 
-let indexes = [];
-
-let actions = [];
-
-let defaultNums = [2, 3, 4, 5, 6, 7, 8, 9];
-// defaultNums = [2];
-
-let equations = [];
 
 let maxPoints = 0;
 let eqAmount = 0;
@@ -248,7 +313,6 @@ let resultsContent
 let darkBg;
 
 
-
 let results_p1, results_p2, results_holder, results_eqAmount;
 let rangeLine, acceptButton;
 
@@ -260,14 +324,6 @@ let firstEquation = true;
 
 setTimeout(() => {
 	
-indexes = [];
-
-actions = [];
-
-defaultNums = [2, 3, 4, 5, 6, 7, 8, 9];
-
-equations = [];
-
 maxPoints = 0;
 eqAmount = 0;
 curPoints = 0;
@@ -303,16 +359,6 @@ trainingInProgress = false;
 
 firstEquation = true;
 
-sign.addEventListener('click', function(e) {
-	checkInputs();
-});
-
-document.addEventListener('keydown', function(e) {
-	if (e.key == 'Enter') {
-		checkInputs();
-	}
-});
-
 answerText.addEventListener('keyup', function(e) {
 	if (answerText.value.length > 2) {
 		answerText.value = answerText.value.substr(0, 2);
@@ -323,19 +369,6 @@ answerText.addEventListener('keyup', function(e) {
 
 
 
-function checkInputs() {
-	if (!trainingInProgress){
-		trainingInProgress = true;
-		start();
-		doEquation();
-	} else if (sign.classList.contains('submit')) {
-		checkAnswer();
-	} else if (resultsElem.classList.contains("full")) {
-		closeResults();
-	} else if (sign.classList.contains('reload')) {
-		resetData();	
-	}
-}
 
 function resetData() {
 	changeSignTo('start');
@@ -650,17 +683,7 @@ function checkNoMistakes() {
 	}
 }
 
-function toggleAnswerTextVisibility(mode) {
-	answerText.classList.toggle('hiden');
-	if (mode == 'none') {
-		setTimeout(() => {
-			answerText.classList.toggle('none');
-			setTimeout(() => {
-				answerText.classList.toggle('none');
-			}, 500)
-		}, 500)
-	}
-}
+
 
 function getEquationString(equation, mode='default') {
 	modes = {
@@ -682,62 +705,11 @@ function changeEquationText(str) {
 	}, 250);
 }
 
-function toggleButtons() {
-	numHolders.forEach(function(elem) {
-		elem.classList.toggle('unactive');
-	});
 
-	actionHolders.forEach(function(elem) {
-		elem.classList.toggle('unactive');
-	});
-
-	selectAllButton.classList.toggle('unactive');
-
-	range.classList.toggle('unactive');
-}
-
-function changeSignTo(type) {
-	switch (type) {
-		case 'start':
-			sign.setAttribute('class', 'sign');
-			sign.classList.add(type);
-			sign.innerHTML = '<div id="sign_start"></div>';
-			break;
-		case 'submit':
-			sign.setAttribute('class', 'sign');
-			sign.classList.add(type);
-			sign.innerHTML = '⇨';
-			break;
-		case 'hiden':
-			sign.setAttribute('class', 'sign');
-			sign.classList.add(type);
-			sign.innerHTML = '';
-			break;
-		case 'reload':
-			sign.setAttribute('class', 'sign');
-			sign.classList.add('reload');
-			sign.innerHTML = '↻';
-			break;
-	}
-}
-
-function toggleEquationArea() {
-	equationArea.classList.toggle('equation_area-active');
-}
-
-function checkActiveActions() {
-	actions = [];
-	let activeActions = document.querySelectorAll('.actionSign.active');
-	for (let elem of activeActions) {
-		actions.push(elem.innerHTML);
-	}
-}
-
-function createEquationsList() {
+function createEquationsList(indexes, actions, coefficient) {
+	let defaultNums = [2, 3, 4, 5, 6, 7, 8, 9];
 
 	let result = generateBaseArray();
-
-	let coefficient = rangeValues[range.value];
 
 	checkBiggerCoefficient();
 

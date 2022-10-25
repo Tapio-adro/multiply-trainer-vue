@@ -265,7 +265,7 @@ table.stats {
 	background-color: #d9d9d9;
 
 }
-.unactive {
+.inactive {
 	pointer-events: none;
 }
 .header {
@@ -360,6 +360,7 @@ table.stats {
 
 input::-webkit-inner-spin-button {
 	-webkit-appearance: none;
+	appearance: none;
 	margin: 0;
 }
 .mistakes_header {
@@ -416,7 +417,7 @@ input::-webkit-inner-spin-button {
 	border-color: var(--green);
 }
 
-.mistakes_area div.unactive {
+.mistakes_area div.inactive {
 	border-color: #d9d9d9;
 }
 
