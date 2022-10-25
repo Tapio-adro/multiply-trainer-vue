@@ -50,7 +50,7 @@
 			</div>
 			<div class="equation_area" ref="equationArea">
 				<div class="equation_text" ref="equationText">{{ equationText }}</div>
-				<input type="number" class="answer_text hiden" ref="answerInput">
+				<input type="number" class="answer_text hiden" ref="answerInput" v-model="answer">
 				<div class="sign start" @click="processEnterInput" ref="sign">
 					<div id="sign_start"></div>
 				</div>
@@ -104,8 +104,7 @@
 </template>
 
 <script>
-import { thisExpression } from '@babel/types';
-
+import hotkeys from 'hotkeys-js';
 
 export default {
   name: "App",
@@ -123,33 +122,32 @@ export default {
 			trainingInProgress: false,
 			equations: [],
 			curEquation: {},
-			equationText: ''
+			equationText: '',
+			answer: '',
+			maxPoints: 0,
+			curPoints: 0
 		}
 	},
 	methods: {
 		start() {
+			// make all input buttons uninteractable
 			this.$refs.inputElems.classList.add('inactive');
-
+			// make equation area border green 
 			this.$refs.equationArea.classList.toggle('equation_area-active');
-
+			// show input to write there answer
 			this.toggleAnswerInput();
-
+			// change green sign with white triangle to smaller with
+			// white arrow, which allows to check answer for equation
 			this.changeSignTo('submit');
-
+			// save time, when training started
 			this.time.timeStart = new Date();
-
+			// form array of input value to be deconstructed for creating array of equations 
 			this.prepareInputValues();
 			this.equations = createEquationsList(...this.inputValues);
 
-			// maxPoints = equations.length;
-			// eqAmount = equations.length;
+			this.maxPoints = this.equations.length;
 
-			// answerInput.focus();
-
-			// window.scrollTo({
-			// 		results: 80,
-			// 		behavior: "smooth"
-			// });
+			this.$refs.answerInput.focus();
 		},
 		toggleOperation(op) {
 			this.operationsData[op] = !this.operationsData[op];
@@ -161,6 +159,7 @@ export default {
 				}
 			}
 			this.refreshEquationsAmount();
+			isTSThisType
 		},
 		toggleNumber(index) {
 			this.numbersData[index].isEnabled = !this.numbersData[index].isEnabled;
@@ -201,16 +200,17 @@ export default {
 			this.equationsAmount = rangeValues[this.$refs.range.value] * defaultAmount;
 		},
 		processEnterInput() {
+			let sign = this.$refs.sign;
 			if (!this.trainingInProgress){
 				this.trainingInProgress = true;
 				this.start();
 				this.showNextEquation();
 			} else if (sign.classList.contains('submit')) {
-				checkAnswer();
+				this.checkAnswer();
 			} else if (resultsElem.classList.contains("full")) {
-				closeResults();
+				this.closeResults();
 			} else if (sign.classList.contains('reload')) {
-				resetData();	
+				this.resetData();	
 			}
 		},
 		toggleAnswerInput(mode) {
@@ -273,7 +273,7 @@ export default {
 			this.inputValues = [numbers, operations, coefficient];
 		},
 		showNextEquation() {
-			this.$refs.answerInput.value = '';
+			this.answer = '';
 			this.curEquation = this.equations.pop();
 			let equationString = getEquationString(this.curEquation);
 			if (this.curEquation.isFirst) {
@@ -299,6 +299,45 @@ export default {
 				that.equationText = str;
 				that.$refs.equationText.classList.remove('hiden');
 			}, 250);
+		},
+		checkAnswer() {
+			let answer = this.answer;
+			let equation = this.curEquation;
+			console.log(equation);
+			let equationArea = this.$refs.equationArea;
+			if (!answer) {
+				return;
+			} else if (answer == equation.answer) {
+				if (equation.type == 'normal') {
+					this.equationsAmount--;
+					this.curPoints++;
+					deactivateMistakesHeader();
+				} else {
+					makeMistakeDiv('solved');
+				}
+			} else {
+				equationArea.classList.toggle('equation_area-mistake');
+				setTimeout(function() {
+					equationArea.classList.toggle('equation_area-mistake');
+				}, 250);
+				if (equation.type == 'normal') {
+					this.equationsAmount--;
+					addMistakeDiv();
+					addAdditionalEquationToList();
+					equationArea.scrollIntoView({behavior: 'smooth'});
+				} else {
+					makeMistakeDiv('failed');
+				}
+			}
+
+			this.$refs.answerInput.focus();
+
+			if (this.equations.length > 0) {
+				this.doEquation();
+			} else {
+				this.hideElementsAndShowResult();
+			}
+			
 		}
 	},
 	mounted() {
@@ -316,7 +355,12 @@ export default {
 			multiplication: true,
 			division: false
 		}
-
+		let that = this;
+		document.addEventListener('keydown', function(e) {
+			if (e.key == 'Enter') {
+				that.processEnterInput();
+			}
+		});
 		this.refreshEquationsAmount();
 	},
 };
@@ -420,46 +464,6 @@ function resetData() {
 	toggleButtons();
 	trainingInProgress = false;
 	mistakesHeader.classList.remove('no_mistakes');
-}
-
-
-function checkAnswer() {
-	let answerString = answerInput.value;
-	if (!answerString) {
-		return;
-	} else if (answerString == equation.answer) {
-		if (equation.type == 'normal') {
-			eqAmount--;
-			curPoints++;
-			deactivateMistakesHeader();
-		} else {
-			makeMistakeDiv('solved');
-		}
-	} else {
-		equationArea.classList.toggle('equation_area-mistake');
-		setTimeout(function() {
-			equationArea.classList.toggle('equation_area-mistake');
-		}, 250);
-		if (equation.type == 'normal') {
-			eqAmount--;
-			addMistakeDiv();
-			addAdditionalEquationToList();
-			equationArea.scrollIntoView({behavior: 'smooth'});
-		} else {
-			makeMistakeDiv('failed');
-		}
-	}
-
-	rangeValue.innerHTML = eqAmount;
-
-	answerInput.focus();
-
-	if (equations.length > 0) {
-		doEquation();
-	} else {
-		hideElementsAndShowResult();
-	}
-	
 }
 
 function hideElementsAndShowResult() {
