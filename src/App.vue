@@ -42,7 +42,7 @@
 						<div class="squares"></div>
 					</div>
 				</div>
-				<input type="range" class="range" min="0" max="4" step="1" value="2"
+				<input type="range" class="range" min="0" max="4" step="1" value="0"
 					ref="range"
 					@input="refreshEquationsAmount()"
 				>
@@ -68,14 +68,45 @@
 			</div>
 		</div>
 	</div>
-	<div class="results">
+	<div class="results" ref="resultsElem">
 		<div class="results_inner">
-			<div class="results_content">
-
+			<div class="results_content" ref="resultsContent">
+				<section>
+					<h2>Результат</h2>
+					<h3>Оцінка: {{ result.mark }}</h3>
+					<div class="range_result">
+						<div class="range_line" ref="markPercentLine"></div>
+					</div>
+					<h3 class="percent">{{ result.percent }}</h3>
+				</section>
+				<section>
+					<h2>Статистика</h2>
+					<table class="stats">
+						<tr>
+							<td>Всього прикладів:</td>
+							<td>{{ maxPoints }}</td>
+						</tr>
+						<tr>
+							<td>Правильних відповідей:</td>
+							<td>{{ curPoints }}</td>
+						</tr>
+						<tr>
+							<td>Час виконання:</td>
+							<td>{{ result.duration }}</td>
+						</tr>
+						<tr>
+							<td class="lastTd">Середній час виконання одного виразу:</td>
+							<td class="lastTd">{{ result.durationAverage }}</td>
+						</tr>
+					</table>
+				</section>
+				<div class="buttonHolder">
+					<div class="acceptButton" @click="processEnterInput">✓</div>
+				</div>
 			</div>
 		</div>
 	</div>
-	<div class="darkBg"></div>
+	<div class="darkBg" ref="darkBg"></div>
 
 	<!-- <div id="buttons_holder">
 		<div id="ref_button" class="top_button">?</div>
@@ -132,7 +163,8 @@ export default {
 			answer: '',
 			maxPoints: 0,
 			curPoints: 0,
-			mistakes: []
+			mistakes: [],
+			result: {}
 		}
 	},
 	methods: {
@@ -214,8 +246,8 @@ export default {
 				this.showNextEquation();
 			} else if (sign.classList.contains('submit')) {
 				this.checkAnswer();
-			} else if (resultsElem.classList.contains("full")) {
-				this.closeResults();
+			} else if (this.$refs.resultsElem.classList.contains("full")) {
+				this.hideResults();
 			} else if (sign.classList.contains('reload')) {
 				this.resetData();	
 			}
@@ -329,7 +361,7 @@ export default {
 				}, 250);
 				if (equation.type == 'normal') {
 					this.equationsAmount--;
-					this.addMistake();
+					this.addMistakeContainer();
 					this.addAdditionalEquationToList();
 					equationArea.scrollIntoView({behavior: 'smooth'});
 				} else {
@@ -346,7 +378,7 @@ export default {
 			}
 			
 		},
-		addMistake() {
+		addMistakeContainer() {
 			let mistake = {
 				text: getEquationString(this.curEquation, 'full'),
 				state: 'neutral'
@@ -390,7 +422,74 @@ export default {
 			newEquation.type = 'additional';
 			newEquation.isFirst = false;
 			this.equations.splice(this.equations.length - 1, 0, newEquation);
-		}
+		},
+		hideElementsAndShowResult() {
+			this.$refs.equationArea.classList.toggle('equation_area-active');
+			equationText.innerHTML = this.curPoints + ' / ' + this.maxPoints;
+
+			this.time.trainingDuration = Math.round((new Date().getTime() - this.time.timeStart.getTime()) / 1000);
+			this.deactivateMistakesHeader();
+			this.checkNoMistakes();
+
+			this.showResults();
+
+			window.scrollTo({
+				top: 0,
+				behavior: "smooth"
+			});
+
+			this.changeSignTo('hiden');
+			this.toggleAnswerInput('none');
+			let that = this;
+			setTimeout(function() {
+				that.changeSignTo('reload');
+			}, 3000);
+		},
+		showResults() {
+			this.result = {
+				mark: Math.round(this.curPoints / this.maxPoints * 12),
+				percent: Math.round(this.curPoints / this.maxPoints * 10000) / 100  + '%',
+				duration: getDuration(this.time.trainingDuration),
+				durationAverage: getDuration(this.time.trainingDuration, 'average', this.maxPoints)
+			}
+
+			let resultsContent = this.$refs.resultsContent;
+			let resultsElem = this.$refs.resultsElem;
+			resultsContent.classList.add("hiden");
+			setTimeout(() => {
+				resultsElem.classList.add("full");
+				this.$refs.darkBg.classList.add('active');
+
+				setTimeout(() => {
+					resultsContent.classList.remove("hiden");
+					setTimeout(() => {
+						this.$refs.markPercentLine.style.width = (this.curPoints / this.maxPoints * 100) + '%';
+					}, 500)
+				}, 500)
+			}, 500)
+		},
+		hideResults() {
+			let resultsElem = this.$refs.resultsElem;
+			this.$refs.darkBg.classList.toggle('active');
+			resultsElem.classList.add('hiden');
+			setTimeout(() => {
+				resultsElem.classList.remove('hiden');
+				resultsElem.classList.remove('full');
+			}, 1000)
+		},
+		resetData() {
+			changeSignTo('start');
+			equationText.innerHTML = '';
+			firstEquation = true;
+			mistakesHeader.innerHTML = '<div class="mistake_cross"></div>';	
+			mistakesArea.innerHTML = '';
+			curPoints = 0;
+			indexes = [];
+			actions = [];
+			toggleButtons();
+			trainingInProgress = false;
+			mistakesHeader.classList.remove('no_mistakes');
+		},
 	},
 	mounted() {
 		// set nums data
@@ -416,19 +515,6 @@ export default {
 		this.refreshEquationsAmount();
 	},
 };
-
-
-let maxPoints = 0;
-let eqAmount = 0;
-let curPoints = 0;
-
-let timeAfterFinish = 3000;
-
-let equation;
-
-let multAction;
-let divisAction;
-let lastActiveAction;
 
 let main;
 let numHolders;
@@ -458,17 +544,6 @@ let firstEquation = true;
 
 setTimeout(() => {
 	
-maxPoints = 0;
-eqAmount = 0;
-curPoints = 0;
-
-timeAfterFinish = 3000;
-
-equation;
-
-multAction = document.querySelector('#multiplication');
-divisAction = document.querySelector('#division');
-lastActiveAction;
 
 main = document.querySelector('.main');
 numHolders = document.querySelectorAll('.numbers');
@@ -504,219 +579,15 @@ answerInput.addEventListener('keyup', function(e) {
 
 
 
-function resetData() {
-	changeSignTo('start');
-	equationText.innerHTML = '';
-	firstEquation = true;
-	mistakesHeader.innerHTML = '<div class="mistake_cross"></div>';	
-	mistakesArea.innerHTML = '';
-	curPoints = 0;
-	indexes = [];
-	actions = [];
-	toggleButtons();
-	trainingInProgress = false;
-	mistakesHeader.classList.remove('no_mistakes');
-}
 
-function hideElementsAndShowResult() {
-	toggleEquationArea();
-
-	openResults();
-
-	trainingDuration = Math.round(
-		(new Date().getTime() - timeStart.getTime()) / 1000);
-
-	equationText.innerHTML = '';
-
-	deactivateMistakesHeader();
-
-	let main = document.querySelector('.main');
-
-	equationText.innerHTML = curPoints + ' / ' + maxPoints;
-
-	checkNoMistakes();
-
-	window.scrollTo({
-	    results: 0,
-	    behavior: "smooth"
-	});
-
-	changeSignTo('hiden');
-	toggleAnswerTextVisibility('none');
-	setTimeout(function() {
-		changeSignTo('reload');
-	}, timeAfterFinish);
-}
 
 // functions
 
 
 
-function openResults () {
 
-	resultsContent.classList.add("hiden");
-	setTimeout(() => {
-		resultsElem.classList.add("full");
-		darkBg.classList.add('active');
 
-		setTimeout(() => {
-			resultsContent.classList.remove("hiden");
-			let result = createResult();
-			result.forEach(elem => resultsContent.appendChild(elem));
-			activateAcceptButton();
-			setTimeout(() => {
-				rangeLine.style.width = (curPoints / maxPoints * 100) + '%';
-			}, 500)
-		}, 500)
-	}, 500)
 
-	function createResult () {
-		let elemArr = [];
-		elemArr.push(createSection1());
-		elemArr.push(createSection2());
-		elemArr.push(createAcceptSign());
-		return elemArr;
-	}
-
-	function createSection1 () {
-		let sect = document.createElement('section');
-
-		let header = document.createElement('h2');
-		header.innerHTML = 'Результат';
-
-		let mark = document.createElement('h3');
-		mark.innerHTML = 'Оцінка: ' + Math.round(curPoints / maxPoints * 12);
-
-		let rangeResult = document.createElement('div');
-		rangeResult.classList.add('range_result');
-
-		let range_line = document.createElement('div');
-		range_line.classList.add('range_line');
-		rangeLine = range_line;
-		rangeResult.appendChild(range_line);
-
-		let percent = document.createElement('h3');
-		percent.classList.add('percent');
-		percent.innerHTML = Math.round(curPoints / maxPoints * 10000) / 100  + '%';
-
-		sect.appendChild(header);
-		sect.appendChild(mark);
-		sect.appendChild(rangeResult);
-		sect.appendChild(percent);
-
-		return sect;
-	}
-
-	function createSection2 () {
-		let sect = document.createElement('section');
-
-		let header = document.createElement('h2');
-		header.innerHTML = 'Статистика';
-
-		let table = createTable();
-
-		sect.appendChild(header);
-		sect.appendChild(table);
-
-		return sect;
-	}
-
-	function createTable () {
-		let table = document.createElement('table');
-		table.classList.add('stats');
-
-		let tableData = [
-			[
-				'Всього прикладів:',
-				maxPoints
-			],
-			[
-				'Правильних відповідей:',
-				curPoints
-			],
-			[
-				'Час виконання:',
-				getDuration()
-			],
-			[
-				'Середній час виконання одного виразу:',
-				getDuration('average'),
-				lastTd = true
-			]
-		];
-
-		for (let data of tableData) {
-			table.appendChild(createTableRow(...data));
-		}
-
-		return table;
-	}
-
-	function createTableRow (td1, td2, lastTd = false) {
-		let row = document.createElement('tr')
-		
-		let td1Elem = document.createElement('td');
-		td1Elem.innerHTML = td1;
-
-		let td2Elem = document.createElement('td');
-		td2Elem.innerHTML = td2;
-
-		if(lastTd) {
-			td1Elem.classList.add('lastTd');
-			td2Elem.classList.add('lastTd');
-		}
-
-		row.appendChild(td1Elem);
-		row.appendChild(td2Elem);
-
-		return row;
-	}
-
-	function createAcceptSign () {
-		let button = document.createElement('div');
-		button.innerHTML = '✓';
-		button.classList.add('acceptButton');
-		acceptButton = button;
-
-		let buttonHolder = document.createElement('div');
-		buttonHolder.classList.add('buttonHolder');
-
-		buttonHolder.appendChild(button);
-
-		return buttonHolder;
-	}
-
-	function activateAcceptButton () {
-		acceptButton.addEventListener('click', function () {
-			closeResults();
-		});
-	}
-}
-
-function closeResults () {
-	darkBg.classList.toggle('active');
-	resultsElem.classList.add('hiden');
-	setTimeout(() => {
-		resultsContent.innerHTML = '';
-		resultsElem.classList.remove('hiden');
-		resultsElem.classList.remove('full');
-	}, 1000)
-}
-
-function getDuration (option) {
-	let sec = trainingDuration;
-
-	sec = option == 'average' ? 
-		Math.round((sec / maxPoints) * 100) / 100 : sec;
-
-	let mins = Math.floor(sec / 60);
-	let secs = sec - mins * 60;
-
-	mins = mins ? mins + 'хв ' : '';
-	secs = secs != 0 ? secs + 'с' : '';
-
-	return mins + secs;
-}
 
 
 
@@ -903,6 +774,20 @@ function getEquationString(equation, mode='default') {
 		}
 	}
 	return modes[mode](equation);
+}
+function getDuration (duration, mode = 'default', maxPoints = 0) {
+	let sec = duration;
+
+	sec = mode == 'average' ? 
+		Math.round((sec / maxPoints) * 100) / 100 : sec;
+
+	let mins = Math.floor(sec / 60);
+	let secs = sec - mins * 60;
+
+	mins = mins ? mins + 'хв ' : '';
+	secs = secs != 0 ? secs + 'с' : '';
+
+	return mins + secs;
 }
 
 </script>
