@@ -69,6 +69,8 @@ body {
 	border-radius: 15px;
 	overflow-x: auto;
 	transition: 0.5s;
+	display: flex;
+	flex-direction: column;
 }
 .results_content.hiden {
 	opacity: 0;
@@ -134,6 +136,8 @@ table.stats {
 	width: 100%;
 	display: flex;
 	justify-content: center;
+	align-items: center;
+	flex: 1;
 }
 .acceptButton {
 	background-color: var(--green);

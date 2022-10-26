@@ -164,7 +164,8 @@ export default {
 			maxPoints: 0,
 			curPoints: 0,
 			mistakes: [],
-			result: {}
+			result: {},
+			canRecieveEnterInput: true
 		}
 	},
 	methods: {
@@ -180,6 +181,8 @@ export default {
 			this.changeSignTo('submit');
 			// save time, when training started
 			this.time.timeStart = new Date();
+			// refresh equations amount
+			this.refreshEquationsAmount();
 			// form array of input value to be deconstructed for creating array of equations 
 			this.prepareInputValues();
 			this.equations = createEquationsList(...this.inputValues);
@@ -239,6 +242,8 @@ export default {
 			this.equationsAmount = rangeValues[this.$refs.range.value] * defaultAmount;
 		},
 		processEnterInput() {
+			if (!this.canRecieveEnterInput) return;
+
 			let sign = this.$refs.sign;
 			if (!this.trainingInProgress){
 				this.trainingInProgress = true;
@@ -441,9 +446,7 @@ export default {
 			this.changeSignTo('hiden');
 			this.toggleAnswerInput('none');
 			let that = this;
-			setTimeout(function() {
-				that.changeSignTo('reload');
-			}, 3000);
+			that.changeSignTo('reload');
 		},
 		showResults() {
 			this.result = {
@@ -456,12 +459,14 @@ export default {
 			let resultsContent = this.$refs.resultsContent;
 			let resultsElem = this.$refs.resultsElem;
 			resultsContent.classList.add("hiden");
+			this.canRecieveEnterInput = false;
 			setTimeout(() => {
 				resultsElem.classList.add("full");
 				this.$refs.darkBg.classList.add('active');
 
 				setTimeout(() => {
 					resultsContent.classList.remove("hiden");
+					this.canRecieveEnterInput = true;
 					setTimeout(() => {
 						this.$refs.markPercentLine.style.width = (this.curPoints / this.maxPoints * 100) + '%';
 					}, 500)
@@ -472,23 +477,24 @@ export default {
 			let resultsElem = this.$refs.resultsElem;
 			this.$refs.darkBg.classList.toggle('active');
 			resultsElem.classList.add('hiden');
+			this.canRecieveEnterInput = false;
 			setTimeout(() => {
 				resultsElem.classList.remove('hiden');
 				resultsElem.classList.remove('full');
+				this.canRecieveEnterInput = true;
 			}, 1000)
 		},
 		resetData() {
-			changeSignTo('start');
-			equationText.innerHTML = '';
-			firstEquation = true;
-			mistakesHeader.innerHTML = '<div class="mistake_cross"></div>';	
-			mistakesArea.innerHTML = '';
-			curPoints = 0;
-			indexes = [];
-			actions = [];
-			toggleButtons();
-			trainingInProgress = false;
-			mistakesHeader.classList.remove('no_mistakes');
+			this.changeSignTo('start');
+			this.equationText = '';
+			this.$refs.mistakesHeader.innerHTML = '<div class="mistake_cross"></div>';	
+			this.$refs.mistakesHeader.classList.remove('no_mistakes');
+			this.maxPoints = 0;
+			this.curPoints = 0;
+			this.$refs.inputElems.classList.remove('inactive');
+			this.trainingInProgress = false;
+			this.$refs.markPercentLine.style.width = '0%';
+			this.mistakes = [];
 		},
 	},
 	mounted() {
@@ -515,6 +521,7 @@ export default {
 		this.refreshEquationsAmount();
 	},
 };
+
 
 let main;
 let numHolders;
