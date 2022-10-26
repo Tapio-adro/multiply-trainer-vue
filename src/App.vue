@@ -201,7 +201,6 @@ export default {
 				}
 			}
 			this.refreshEquationsAmount();
-			isTSThisType
 		},
 		toggleNumber(index) {
 			this.numbersData[index].isEnabled = !this.numbersData[index].isEnabled;
@@ -430,7 +429,7 @@ export default {
 		},
 		hideElementsAndShowResult() {
 			this.$refs.equationArea.classList.toggle('equation_area-active');
-			equationText.innerHTML = this.curPoints + ' / ' + this.maxPoints;
+			this.equationText = this.curPoints + ' / ' + this.maxPoints;
 
 			this.time.trainingDuration = Math.round((new Date().getTime() - this.time.timeStart.getTime()) / 1000);
 			this.deactivateMistakesHeader();
@@ -495,6 +494,7 @@ export default {
 			this.trainingInProgress = false;
 			this.$refs.markPercentLine.style.width = '0%';
 			this.mistakes = [];
+			this
 		},
 	},
 	mounted() {
@@ -522,180 +522,96 @@ export default {
 	},
 };
 
+// let colorButton;
+// let colorsHolder;
+// let colorButtons;
 
-let main;
-let numHolders;
-let actionHolders;
-let equationText;
-let answerInput;
-let equationArea;
-let mistakesArea;
-let mistakesHeader;
-let sign;
-let selectAllButton;
-let range;
-let rangeValue;
-let resultsElem;
-let resultsContent
-let darkBg;
+// let canChangeColor = false;
 
-
-let results_p1, results_p2, results_holder, results_eqAmount;
-let rangeLine, acceptButton;
-
-let trainingInProgress = false;
-
-
-let firstEquation = true;
-
-
-setTimeout(() => {
-	
-
-main = document.querySelector('.main');
-numHolders = document.querySelectorAll('.numbers');
-actionHolders = document.querySelectorAll('.actionSign');
-equationText = document.querySelector('.equation_text');
-answerInput = document.querySelector('.answer_text');
-equationArea = document.querySelector('.equation_area');
-mistakesArea = document.querySelector('.mistakes_area');
-mistakesHeader = document.querySelector('.mistakes_header');
-sign = document.querySelector('.sign');
-selectAllButton = document.querySelector('.select_all_button');
-range = document.querySelector('.range');
-rangeValue = document.querySelector('.range_value');
-resultsElem = document.querySelector('.results');
-resultsContent = document.querySelector('.results_content')
-darkBg = document.querySelector('.darkBg')
-
-results_p1, results_p2, results_holder, results_eqAmount;
-rangeLine, acceptButton;
-
-trainingInProgress = false;
-
-firstEquation = true;
-
-answerInput.addEventListener('keyup', function(e) {
-	if (answerInput.value.length > 2) {
-		answerInput.value = answerInput.value.substr(0, 2);
-	}
-});
-}, 1000)
-
-
-
-
-
-
-
-// functions
-
-
-
-
-
-
-
-
-
-
-
-
-
-let colorButton;
-let colorsHolder;
-let colorButtons;
-let shrinkLink;
-let linkToFractionButton;
-let linkToMainButton;
-let refButton;
-let refWrapper;
-
-let canChangeColor = false;
-
-setTimeout(() => {
-	colorButton = document.querySelector('#color_button');
-	colorsHolder = document.querySelector('#colors_container');
-	colorButtons = document.querySelectorAll('.color_container');
-	shrinkLink = document.querySelector('#shrink_link_wrapper');
-	linkToFractionButton = document.querySelector('#linkToFraction');
-	linkToMainButton = document.querySelector('#linkToMain');
-	refButton = document.querySelector('#ref_button');
-	refWrapper = document.querySelector('.ref_wrapper');
-	activateColorButtons();
-	// if (linkToFractionButton) {
-	// 	linkToFractionButton.addEventListener('click', ev => {
-	// 		if (linkToFractionButton.classList.contains('active')) {
-	// 			window.location.href = "./fraction/index.html";
-	// 		} else {
-	// 			linkToFractionButton.classList.add('active');
-	// 			linkToFractionButton.innerHTML = 'Тренажер дробів';
-	// 			shrinkLink.classList.remove('hiden');
-	// 		}
-	// 	})
-	// 	shrinkLink.addEventListener('click', ev => {
-	// 		if (!shrinkLink.classList.contains('hiden')) {
-	// 			shrinkLink.classList.add('hiden');
-	// 			linkToFractionButton.innerHTML = '<div class="fract"> <div class="numer">1</div> <div class="denom" style="border-top: 2px solid rgb(0, 0, 0)">2</div> </div>';
-	// 			linkToFractionButton.classList.remove('active');
-	// 		}
-	// 	})
-	// } else {
-	// 	linkToMainButton.addEventListener('click', ev => {
-	// 		if (linkToMainButton.classList.contains('active')) {
-	// 			window.location.href = "../index.html";
-	// 		} else {
-	// 			linkToMainButton.classList.add('active');
-	// 			linkToMainButton.innerHTML = 'Тренажер множення';
-	// 			shrinkLink.classList.remove('hiden');
-	// 		}
-	// 	})
-	// 	shrinkLink.addEventListener('click', ev => {
-	// 		if (!shrinkLink.classList.contains('hiden')) {
-	// 			shrinkLink.classList.add('hiden');
-	// 			linkToMainButton.innerHTML = '2 × 2';
-	// 			linkToMainButton.classList.remove('active');
-	// 		}
-	// 	})
-	// }
-	// refButton.addEventListener('click', ev => {
-	// 	refButton.classList.toggle('active');
-	// 	refWrapper.classList.toggle('hiden');
-	// })
+// setTimeout(() => {
+// 	colorButton = document.querySelector('#color_button');
+// 	colorsHolder = document.querySelector('#colors_container');
+// 	colorButtons = document.querySelectorAll('.color_container');
+// 	shrinkLink = document.querySelector('#shrink_link_wrapper');
+// 	linkToFractionButton = document.querySelector('#linkToFraction');
+// 	linkToMainButton = document.querySelector('#linkToMain');
+// 	refButton = document.querySelector('#ref_button');
+// 	refWrapper = document.querySelector('.ref_wrapper');
+// 	activateColorButtons();
+// 	// if (linkToFractionButton) {
+// 	// 	linkToFractionButton.addEventListener('click', ev => {
+// 	// 		if (linkToFractionButton.classList.contains('active')) {
+// 	// 			window.location.href = "./fraction/index.html";
+// 	// 		} else {
+// 	// 			linkToFractionButton.classList.add('active');
+// 	// 			linkToFractionButton.innerHTML = 'Тренажер дробів';
+// 	// 			shrinkLink.classList.remove('hiden');
+// 	// 		}
+// 	// 	})
+// 	// 	shrinkLink.addEventListener('click', ev => {
+// 	// 		if (!shrinkLink.classList.contains('hiden')) {
+// 	// 			shrinkLink.classList.add('hiden');
+// 	// 			linkToFractionButton.innerHTML = '<div class="fract"> <div class="numer">1</div> <div class="denom" style="border-top: 2px solid rgb(0, 0, 0)">2</div> </div>';
+// 	// 			linkToFractionButton.classList.remove('active');
+// 	// 		}
+// 	// 	})
+// 	// } else {
+// 	// 	linkToMainButton.addEventListener('click', ev => {
+// 	// 		if (linkToMainButton.classList.contains('active')) {
+// 	// 			window.location.href = "../index.html";
+// 	// 		} else {
+// 	// 			linkToMainButton.classList.add('active');
+// 	// 			linkToMainButton.innerHTML = 'Тренажер множення';
+// 	// 			shrinkLink.classList.remove('hiden');
+// 	// 		}
+// 	// 	})
+// 	// 	shrinkLink.addEventListener('click', ev => {
+// 	// 		if (!shrinkLink.classList.contains('hiden')) {
+// 	// 			shrinkLink.classList.add('hiden');
+// 	// 			linkToMainButton.innerHTML = '2 × 2';
+// 	// 			linkToMainButton.classList.remove('active');
+// 	// 		}
+// 	// 	})
+// 	// }
+// 	// refButton.addEventListener('click', ev => {
+// 	// 	refButton.classList.toggle('active');
+// 	// 	refWrapper.classList.toggle('hiden');
+// 	// })
 	
 	
 	
-	// document.addEventListener('keydown', function(e) {
-	// if (refButton.classList.contains('active') && e.key == 'Escape') {
-	// 	refButton.classList.toggle('active');
-	// 	refWrapper.classList.toggle('hiden');	
-	// 	}
-	// });
+// 	// document.addEventListener('keydown', function(e) {
+// 	// if (refButton.classList.contains('active') && e.key == 'Escape') {
+// 	// 	refButton.classList.toggle('active');
+// 	// 	refWrapper.classList.toggle('hiden');	
+// 	// 	}
+// 	// });
 	
-	// colorsHolder.addEventListener('click', ev => {
-	// 	if (!canChangeColor) {
-	// 		colorsHolder.classList.toggle('active');
-	// 		setTimeout(() => {
-	// 			canChangeColor = true;
-	// 		}, 500)
-	// 	}
-	// })
-}, 1000)
+// 	// colorsHolder.addEventListener('click', ev => {
+// 	// 	if (!canChangeColor) {
+// 	// 		colorsHolder.classList.toggle('active');
+// 	// 		setTimeout(() => {
+// 	// 			canChangeColor = true;
+// 	// 		}, 500)
+// 	// 	}
+// 	// })
+// }, 1000)
 
-function activateColorButtons () {
-	for (let button of colorButtons) {
-		button.addEventListener('click', ev => {
-			if (canChangeColor) {
-				let color = button.style.backgroundColor;
-				document.documentElement.style.setProperty('--green', color);
-				colorsHolder.classList.toggle('active');
-				setTimeout(() => {
-					canChangeColor = false;
-				}, 0)
-			}
-		})
-	}
-}
+// function activateColorButtons () {
+// 	for (let button of colorButtons) {
+// 		button.addEventListener('click', ev => {
+// 			if (canChangeColor) {
+// 				let color = button.style.backgroundColor;
+// 				document.documentElement.style.setProperty('--green', color);
+// 				colorsHolder.classList.toggle('active');
+// 				setTimeout(() => {
+// 					canChangeColor = false;
+// 				}, 0)
+// 			}
+// 		})
+// 	}
+// }
+
 
 // external functions
 
