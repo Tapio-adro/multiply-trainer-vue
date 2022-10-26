@@ -55,10 +55,17 @@
 					<div id="sign_start"></div>
 				</div>
 			</div>
-			<div class="mistakes_header">
+			<div class="mistakes_header" ref="mistakesHeader">
 				<div class="mistake_cross"></div>
 			</div>
-			<div class="mistakes_area"></div>
+			<div class="mistakes_area">
+				<div 
+					v-for="(mistake, index) in mistakes" :key="index"
+					:class="{solved: mistake.state == 'solved', failed: mistake.state == 'failed'}"
+				>
+				  {{ mistake.text }}
+				</div>
+			</div>
 		</div>
 	</div>
 	<div class="results">
@@ -104,7 +111,6 @@
 </template>
 
 <script>
-import hotkeys from 'hotkeys-js';
 
 export default {
   name: "App",
@@ -125,7 +131,8 @@ export default {
 			equationText: '',
 			answer: '',
 			maxPoints: 0,
-			curPoints: 0
+			curPoints: 0,
+			mistakes: []
 		}
 	},
 	methods: {
@@ -303,17 +310,17 @@ export default {
 		checkAnswer() {
 			let answer = this.answer;
 			let equation = this.curEquation;
-			console.log(equation);
 			let equationArea = this.$refs.equationArea;
+
 			if (!answer) {
 				return;
 			} else if (answer == equation.answer) {
 				if (equation.type == 'normal') {
 					this.equationsAmount--;
 					this.curPoints++;
-					deactivateMistakesHeader();
+					this.deactivateMistakesHeader();
 				} else {
-					makeMistakeDiv('solved');
+					this.changeMistakeStateTo('solved');
 				}
 			} else {
 				equationArea.classList.toggle('equation_area-mistake');
@@ -322,22 +329,67 @@ export default {
 				}, 250);
 				if (equation.type == 'normal') {
 					this.equationsAmount--;
-					addMistakeDiv();
-					addAdditionalEquationToList();
+					this.addMistake();
+					this.addAdditionalEquationToList();
 					equationArea.scrollIntoView({behavior: 'smooth'});
 				} else {
-					makeMistakeDiv('failed');
+					this.changeMistakeStateTo('failed');
 				}
 			}
-
+			
 			this.$refs.answerInput.focus();
 
 			if (this.equations.length > 0) {
-				this.doEquation();
+				this.showNextEquation();
 			} else {
 				this.hideElementsAndShowResult();
 			}
 			
+		},
+		addMistake() {
+			let mistake = {
+				text: getEquationString(this.curEquation, 'full'),
+				state: 'neutral'
+			}
+			this.mistakes.push(mistake);
+			let mistakesAmount = this.mistakes.length;
+			if (mistakesAmount == 1) {
+				this.$refs.mistakesHeader.classList.add('active');
+			} else {
+				this.$refs.mistakesHeader.classList.add('active');
+				this.$refs.mistakesHeader.innerHTML += '<div class="mistake_cross"></div>';
+			}
+			if (mistakesAmount > 6) {
+				this.mistakes.shift();
+			}
+		},
+		changeMistakeStateTo(type) {
+			for (let mistake of this.mistakes) {
+				if (mistake.text == getEquationString(this.curEquation, 'full') 
+					&& mistake.state == 'neutral') {
+					mistake.state = type;
+					return;
+				}
+			}
+		},
+		deactivateMistakesHeader() {
+			let uncorrectedMistakes = this.mistakes.filter((mistake) => {
+				return mistake.state == 'neutral';
+			});
+			if (uncorrectedMistakes.length == 0) {
+				this.$refs.mistakesHeader.classList.remove('active');
+			}
+		},
+		checkNoMistakes() {
+			if (this.curPoints == this.maxPoints) {
+				this.$refs.mistakesHeader.classList.toggle('no_mistakes');
+			}
+		},
+		addAdditionalEquationToList() {
+			let newEquation = this.curEquation;
+			newEquation.type = 'additional';
+			newEquation.isFirst = false;
+			this.equations.splice(this.equations.length - 1, 0, newEquation);
 		}
 	},
 	mounted() {
@@ -667,52 +719,9 @@ function getDuration (option) {
 }
 
 
-function deactivateMistakesHeader() {
-	let mistakeDivs = document.querySelectorAll('.mistakes_area div:not(.failed, .solved)');
-	if (mistakeDivs.length == 0) {
-		mistakesHeader.classList.remove('active');
-	}
-}
 
-function addMistakeDiv() {
-	let mistakeDiv = document.createElement('div');
-	mistakeDiv.innerHTML = getEquationString(equation, 'full');
-	mistakesArea.appendChild(mistakeDiv);
-	let mistakeDivs = document.querySelectorAll('.mistakes_area div');
-	if (mistakeDivs.length == 1) {
-		mistakesHeader.classList.add('active');
-	} else {
-		mistakesHeader.classList.add('active');
-		mistakesHeader.innerHTML += '<div class="mistake_cross"></div>';
-	}
-	if (mistakeDivs.length > 6) {
-		mistakesArea.removeChild(mistakeDivs[0]);
-	}
-}
 
-function addAdditionalEquationToList() {
-	let newEquation = equation;
-	newEquation.type = 'additional';
-	equations.splice(equations.length - 1, 0, newEquation);
-}
 
-function makeMistakeDiv(type) {
-	let mistakeDivs = document.querySelectorAll('.mistakes_area div');
-	for (let elem of mistakeDivs) {
-		if (elem.innerHTML == getEquationString(equation, 'full') 
-			&& !elem.classList.contains('failed')
-			&& !elem.classList.contains('solved')) {
-			elem.classList.add(type);
-			return;
-		}
-	}
-}
-
-function checkNoMistakes() {
-	if (curPoints == maxPoints) {
-		mistakesHeader.classList.toggle('no_mistakes');
-	}
-}
 
 
 let colorButton;
