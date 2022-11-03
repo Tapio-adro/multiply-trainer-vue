@@ -2,7 +2,7 @@
   <div class="main">
 		<div class="wrapper">
 			<!-- <inputs ref="inputElems"/> -->
-			<div id="input_elems" ref="inputElems">
+			<div id="inputs" ref="inputElems">
 				<div class="header">
 					<span 
 						id="multiplication" 
@@ -42,7 +42,7 @@
 					ref="range"
 					@input="refreshEquationsAmount()"
 				>
-				<div class="range_value">{{ equationsAmount }}</div>
+				<div class="equations_amount">{{ equationsAmount }}</div>
 			</div>
 			<div class="equation_area" ref="equationArea">
 				<div class="equation_text" ref="equationText">{{ equationText }}</div>
