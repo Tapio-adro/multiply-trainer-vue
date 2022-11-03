@@ -1,6 +1,7 @@
 <template>
   <div class="main">
 		<div class="wrapper">
+			<!-- <inputs ref="inputElems"/> -->
 			<div id="input_elems" ref="inputElems">
 				<div class="header">
 					<span 
@@ -68,11 +69,11 @@
 			<div class="results_content" ref="resultsContent">
 				<section>
 					<h2>Результат</h2>
-					<h3>Оцінка: {{ result.mark }}</h3>
+					<h3>Оцінка: {{ results.mark }}</h3>
 					<div class="range_result">
 						<div class="range_line" ref="percentLine"></div>
 					</div>
-					<h3 class="percent">{{ result.percent }}</h3>
+					<h3 class="percent">{{ results.percent }}</h3>
 				</section>
 				<section>
 					<h2>Статистика</h2>
@@ -87,11 +88,11 @@
 						</tr>
 						<tr>
 							<td>Час виконання:</td>
-							<td>{{ result.duration }}</td>
+							<td>{{ results.duration }}</td>
 						</tr>
 						<tr>
 							<td class="lastTd">Середній час виконання одного виразу:</td>
-							<td class="lastTd">{{ result.durationAverage }}</td>
+							<td class="lastTd">{{ results.durationAverage }}</td>
 						</tr>
 					</table>
 				</section>
@@ -137,9 +138,13 @@
 </template>
 
 <script>
+import Inputs from '../components/Inputs.vue'
 
 export default {
   name: "App",
+	components: {
+		Inputs
+	},
 	data() {
 		return {
 			numbersData: [],
@@ -159,9 +164,32 @@ export default {
 			maxPoints: 0,
 			curPoints: 0,
 			mistakes: [],
-			result: {},
+			results: {},
 			canRecieveEnterInput: true
 		}
+	},
+	mounted() {
+		// set nums data
+		let defaultNums = [2, 3, 4, 5, 6, 7, 8, 9];
+		for (let key in defaultNums) {
+			let num = defaultNums[key];
+			this.numbersData[key] = {num, isEnabled: false}
+			if (num == 2) {
+				this.numbersData[key].isEnabled = true;
+			}
+		}
+		// set operations data
+		this.operationsData = {
+			multiplication: true,
+			division: false
+		}
+		let that = this;
+		document.addEventListener('keydown', function(e) {
+			if (e.key == 'Enter') {
+				that.processEnterInput();
+			}
+		});
+		this.refreshEquationsAmount();
 	},
 	methods: {
 		start() {
@@ -373,7 +401,7 @@ export default {
 			if (this.equations.length > 0) {
 				this.showNextEquation();
 			} else {
-				this.hideElementsAndShowResult();
+				this.hideElementsAndShowResults();
 			}
 			
 		},
@@ -422,7 +450,7 @@ export default {
 			newEquation.isFirst = false;
 			this.equations.splice(this.equations.length - 1, 0, newEquation);
 		},
-		hideElementsAndShowResult() {
+		hideElementsAndShowResults() {
 			this.$refs.equationArea.classList.toggle('equation_area-active');
 			this.equationText = this.curPoints + ' / ' + this.maxPoints;
 
@@ -443,7 +471,7 @@ export default {
 			that.changeSignTo('reload');
 		},
 		showResults() {
-			this.result = {
+			this.results = {
 				mark: Math.round(this.curPoints / this.maxPoints * 12),
 				percent: Math.round(this.curPoints / this.maxPoints * 10000) / 100  + '%',
 				duration: getDuration(this.time.trainingDuration),
@@ -491,29 +519,6 @@ export default {
 			this.mistakes = [];
 			this
 		},
-	},
-	mounted() {
-		// set nums data
-		let defaultNums = [2, 3, 4, 5, 6, 7, 8, 9];
-		for (let key in defaultNums) {
-			let num = defaultNums[key];
-			this.numbersData[key] = {num, isEnabled: false}
-			if (num == 2) {
-				this.numbersData[key].isEnabled = true;
-			}
-		}
-		// set operations data
-		this.operationsData = {
-			multiplication: true,
-			division: false
-		}
-		let that = this;
-		document.addEventListener('keydown', function(e) {
-			if (e.key == 'Enter') {
-				that.processEnterInput();
-			}
-		});
-		this.refreshEquationsAmount();
 	},
 };
 
@@ -707,5 +712,18 @@ function getDuration (duration, mode = 'default', maxPoints = 0) {
 
 	return mins + secs;
 }
-
+// function getInputsOptions () {
+// 	return {
+// 		inputSections: [
+// 			{
+// 				name: 'numbers', 
+// 				values: [2, 3, 4, 5, 6, 7, 8, 9], 
+// 				toggleAllButton: true
+// 			},
+// 		],
+// 		defaultRangeValues: true,
+// 		rangeValues: {min: 1, initialValue: 3, max: 5},
+// 		amountCoefficient: 8
+// 	}
+// }
 </script>
