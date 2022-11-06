@@ -44,40 +44,42 @@
 				>
 				<div class="equations_amount">{{ equationsAmount }}</div>
 			</div>
-			<div class="equation_area" ref="equationArea">
+			<div id="equation_area" ref="equationArea">
 				<div class="equation_text" ref="equationText">{{ equationText }}</div>
 				<input type="number" class="answer_text hiden" ref="answerInput" v-model="answer">
 				<div class="sign start" @click="processEnterInput" ref="sign">
 					<div id="sign_start"></div>
 				</div>
 			</div>
-			<div class="mistakes_header" ref="mistakesHeader">
-				<div class="mistake_cross"></div>
-			</div>
-			<div class="mistakes_area">
-				<div 
-					v-for="(mistake, index) in mistakes" :key="index"
-					:class="{solved: mistake.state == 'solved', failed: mistake.state == 'failed'}"
-				>
-				  {{ mistake.text }}
+			<div v-auto-animate id="mistakes">
+				<div class="mistakes_header" ref="mistakesHeader">
+					<div class="mistake_cross"></div>
+				</div>
+				<div v-auto-animate class="mistakes_area">
+					<div 
+						v-for="(mistake, index) in mistakes" :key="index"
+						:class="{solved: mistake.state == 'solved', failed: mistake.state == 'failed'}"
+					>
+						{{ mistake.text }}
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div class="results" ref="resultsElem">
-		<div class="results_inner">
-			<div class="results_content" ref="resultsContent">
+	<div id="results" ref="resultsElem">
+		<div id="results_inner">
+			<div id="results_content" ref="resultsContent">
 				<section>
 					<h2>Результат</h2>
 					<h3>Оцінка: {{ results.mark }}</h3>
-					<div class="range_result">
-						<div class="range_line" ref="percentLine"></div>
+					<div class="progress_bar">
+						<div class="progress_line" ref="progressLine"></div>
 					</div>
-					<h3 class="percent">{{ results.percent }}</h3>
+					<h3 class="progress_percent">{{ results.percent }}</h3>
 				</section>
 				<section>
 					<h2>Статистика</h2>
-					<table class="stats">
+					<table>
 						<tr>
 							<td>Всього прикладів:</td>
 							<td>{{ maxPoints }}</td>
@@ -102,7 +104,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="darkBg" ref="darkBg"></div>
+	<div id="darkBg" ref="darkBg"></div>
 
 	<!-- <div id="buttons_holder">
 		<div id="ref_button" class="top_button">?</div>
@@ -124,17 +126,6 @@
 			</div>
 		</div>
 	</div> -->
-	<div class="ref_wrapper hiden">
-		<div class="ref_content">
-			<section>
-				<h2>Призначення</h2>
-				<p>Програма використовується для покращення та закріплення знання таблички множення і ділення.</p>
-			</section>
-			<section>
-				<h2>Налаштування</h2>
-			</section>
-		</div>
-	</div>
 </template>
 
 <script>
@@ -196,7 +187,7 @@ export default {
 			// make all input buttons uninteractable
 			this.$refs.inputElems.classList.add('inactive');
 			// make equation area border green 
-			this.$refs.equationArea.classList.toggle('equation_area-active');
+			this.$refs.equationArea.classList.toggle('active');
 			// show input to write there answer
 			this.toggleAnswerInput();
 			// change green sign with white triangle to smaller with
@@ -382,9 +373,9 @@ export default {
 					this.changeMistakeStateTo('solved');
 				}
 			} else {
-				equationArea.classList.toggle('equation_area-mistake');
+				equationArea.classList.toggle('mistake');
 				setTimeout(function() {
-					equationArea.classList.toggle('equation_area-mistake');
+					equationArea.classList.toggle('mistake');
 				}, 250);
 				if (equation.type == 'normal') {
 					this.equationsAmount--;
@@ -451,7 +442,7 @@ export default {
 			this.equations.splice(this.equations.length - 1, 0, newEquation);
 		},
 		hideElementsAndShowResults() {
-			this.$refs.equationArea.classList.toggle('equation_area-active');
+			this.$refs.equationArea.classList.toggle('active');
 			this.equationText = this.curPoints + ' / ' + this.maxPoints;
 
 			this.time.trainingDuration = Math.round((new Date().getTime() - this.time.timeStart.getTime()) / 1000);
@@ -490,7 +481,7 @@ export default {
 					resultsContent.classList.remove("hiden");
 					this.canRecieveEnterInput = true;
 					setTimeout(() => {
-						this.$refs.percentLine.style.width = (this.curPoints / this.maxPoints * 100) + '%';
+						this.$refs.progressLine.style.width = (this.curPoints / this.maxPoints * 100) + '%';
 					}, 500)
 				}, 500)
 			}, 500)
@@ -515,7 +506,7 @@ export default {
 			this.curPoints = 0;
 			this.$refs.inputElems.classList.remove('inactive');
 			this.trainingInProgress = false;
-			this.$refs.percentLine.style.width = '0%';
+			this.$refs.progressLine.style.width = '0%';
 			this.mistakes = [];
 			this
 		},
