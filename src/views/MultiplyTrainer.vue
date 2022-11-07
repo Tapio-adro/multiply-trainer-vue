@@ -1,7 +1,7 @@
 <template>
   <div class="main">
 		<div class="wrapper">
-			<!-- <inputs ref="inputElems"/> -->
+			<inputs :inputs-options="getInputsOptions()" ref="inputElems"/>
 			<div id="inputs" ref="inputElems">
 				<div class="header">
 					<span 
@@ -205,55 +205,6 @@ export default {
 
 			this.$refs.answerInput.focus();
 		},
-		toggleOperation(op) {
-			this.operationsData[op] = !this.operationsData[op];
-			if (!Object.values(this.operationsData).some(value => value)) {
-				if (op == 'multiplication') {
-					this.operationsData['division'] = true;
-				} else {
-					this.operationsData['multiplication'] = true;
-				}
-			}
-			this.refreshEquationsAmount();
-		},
-		toggleNumber(index) {
-			this.numbersData[index].isEnabled = !this.numbersData[index].isEnabled;
-			this.refreshEquationsAmount();
-		},
-		toggleAllNumbers() {
-			let button = this.$refs.toggleNumbersButton;
-			let that = this;
-
-			button.classList.toggle('active');
-			
-			let nums = [2, 3, 4, 5, 6, 7, 8, 9];
-			let curInterval = setInterval(function() {
-				let num = nums.shift();
-				let numItem = that.numbersData[num - 2];
-				if (button.classList.contains('active')) {
-					numItem.isEnabled = true;
-				} else {
-					numItem.isEnabled = false;
-				}
-				that.refreshEquationsAmount();
-				if (nums.length == 0) {
-					clearInterval(curInterval);
-				}
-			}, 50);
-		},
-		refreshEquationsAmount() {
-			let rangeValues = [0.25, 0.5, 1, 2, 4];
-			this.rangeData.coefficient = rangeValues[this.$refs.range.value];
-
-			let enabledNumbersAmount = this.numbersData.filter(num => num.isEnabled).length;
-
-			let enabledOperationsAmount = 0;
-			enabledOperationsAmount += this.operationsData.division ? 1 : 0;
-			enabledOperationsAmount += this.operationsData.multiplication ? 1 : 0;
-
-			let defaultAmount = enabledNumbersAmount * enabledOperationsAmount * 8;
-			this.equationsAmount = rangeValues[this.$refs.range.value] * defaultAmount;
-		},
 		processEnterInput() {
 			if (!this.canRecieveEnterInput) return;
 
@@ -328,6 +279,7 @@ export default {
 			}
 			let coefficient = this.rangeData.coefficient;
 			this.inputValues = [numbers, operations, coefficient];
+			console.log(this.inputValues);
 		},
 		showNextEquation() {
 			this.answer = '';
@@ -510,6 +462,76 @@ export default {
 			this.mistakes = [];
 			this
 		},
+		getInputsOptions () {
+			return {
+				buttonsSections: [
+					{
+						type: 'multiplication_header',
+						name: 'operations', 
+						values: ['×', '÷'], 
+						toggleAllButton: false
+					},
+					{
+						type: 'default',
+						name: 'numbers', 
+						values: [2, 3, 4, 5, 6, 7, 8, 9], 
+						toggleAllButton: true
+					}
+				],
+				defaultRangeValues: true,
+				rangeValues: {min: 1, initialValue: 3, max: 5},
+				amountCoefficient: 8
+			}
+		},
+		toggleOperation(op) {
+			this.operationsData[op] = !this.operationsData[op];
+			if (!Object.values(this.operationsData).some(value => value)) {
+				if (op == 'multiplication') {
+					this.operationsData['division'] = true;
+				} else {
+					this.operationsData['multiplication'] = true;
+				}
+			}
+			this.refreshEquationsAmount();
+		},
+		toggleNumber(index) {
+			this.numbersData[index].isEnabled = !this.numbersData[index].isEnabled;
+			this.refreshEquationsAmount();
+		},
+		toggleAllNumbers() {
+			let button = this.$refs.toggleNumbersButton;
+			let that = this;
+
+			button.classList.toggle('active');
+			
+			let nums = [2, 3, 4, 5, 6, 7, 8, 9];
+			let curInterval = setInterval(function() {
+				let num = nums.shift();
+				let numItem = that.numbersData[num - 2];
+				if (button.classList.contains('active')) {
+					numItem.isEnabled = true;
+				} else {
+					numItem.isEnabled = false;
+				}
+				that.refreshEquationsAmount();
+				if (nums.length == 0) {
+					clearInterval(curInterval);
+				}
+			}, 50);
+		},
+		refreshEquationsAmount() {
+			let rangeValues = [0.25, 0.5, 1, 2, 4];
+			this.rangeData.coefficient = rangeValues[this.$refs.range.value];
+
+			let enabledNumbersAmount = this.numbersData.filter(num => num.isEnabled).length;
+
+			let enabledOperationsAmount = 0;
+			enabledOperationsAmount += this.operationsData.division ? 1 : 0;
+			enabledOperationsAmount += this.operationsData.multiplication ? 1 : 0;
+
+			let defaultAmount = enabledNumbersAmount * enabledOperationsAmount * 8;
+			this.equationsAmount = rangeValues[this.$refs.range.value] * defaultAmount;
+		}
 	},
 };
 
@@ -703,18 +725,5 @@ function getDuration (duration, mode = 'default', maxPoints = 0) {
 
 	return mins + secs;
 }
-// function getInputsOptions () {
-// 	return {
-// 		inputSections: [
-// 			{
-// 				name: 'numbers', 
-// 				values: [2, 3, 4, 5, 6, 7, 8, 9], 
-// 				toggleAllButton: true
-// 			},
-// 		],
-// 		defaultRangeValues: true,
-// 		rangeValues: {min: 1, initialValue: 3, max: 5},
-// 		amountCoefficient: 8
-// 	}
-// }
+
 </script>

@@ -53,14 +53,14 @@ body .inactive {
           user-select: none;
   font-family: serif;
 }
-#inputs .nums_holder {
+#inputs .buttons_row div, #inputs .nums_holder {
   max-width: 800px;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
 }
-#inputs .numbers, #inputs .actionSign {
+#inputs .numbers, #inputs .actionSign, #inputs .buttons_row div button {
   width: 50px;
   height: 50px;
   display: flex;
@@ -76,11 +76,13 @@ body .inactive {
       -ms-user-select: none;
           user-select: none;
   z-index: 1;
+  border: none;
+  font-size: 16px;
 }
-#inputs .numbers.active, #inputs .actionSign.active {
+#inputs .numbers.active, #inputs .actionSign.active, #inputs .buttons_row div button.active {
   background-color: var(--green);
 }
-#inputs .select_all_button {
+#inputs .select_all_button, #inputs .buttons_row .toggle_all_button {
   width: 50px;
   height: 50px;
   border-radius: 10px;
@@ -94,14 +96,14 @@ body .inactive {
   grid-gap: 8px;
   padding: 8px;
 }
-#inputs .select_all_button .squares {
+#inputs .select_all_button .squares, #inputs .select_all_button div, #inputs .buttons_row .toggle_all_button .squares, #inputs .buttons_row .toggle_all_button div {
   background-color: var(--green);
   border-radius: 3px;
 }
-#inputs .select_all_button.active {
+#inputs .select_all_button.active, #inputs .buttons_row .toggle_all_button.active {
   background-color: var(--green);
 }
-#inputs .select_all_button.active .squares {
+#inputs .select_all_button.active .squares, #inputs .select_all_button.active div, #inputs .buttons_row .toggle_all_button.active .squares, #inputs .buttons_row .toggle_all_button.active div {
   background-color: #d9d9d9;
 }
 #inputs .range {

@@ -1,21 +1,44 @@
 <template>
-  <div>
-    
-    <div class="header">
-      <span 
-        id="multiplication" 
-        class="actionSign"
-        :class="{active: operationsData.multiplication}"
-        @click="toggleOperation('multiplication')"
-      >×</span> 
-      & 
-      <span 
-        id="division" 
-        class="actionSign"
-        :class="{active: operationsData.division}"
-        @click="toggleOperation('division')"
-      >÷</span>
+  <div id="inputs">
+    <div class="buttons_row"
+      v-for="(buttonsRow, rowIndex) in buttonsRows" :key="rowIndex"
+    >
+      <div v-if="buttonsRow.type == 'multiplication_header'">
+        <div class="header">
+          <button 
+            :class="{active: buttonsRow.buttons[0].isEnabled}"
+            @click="toggleButton(rowIndex, 0)"
+          >×</button> 
+          & 
+          <button 
+          :class="{active: buttonsRow.buttons[1].isEnabled}"
+            @click="toggleButton(rowIndex, 1)"
+          >÷</button>
+        </div>
+      </div>
+      <div v-else>
+        <button 
+          v-for="(button, index) in buttonsRow.buttons" :key="index"
+          :class="{active: button.isEnabled}"
+          @click="toggleButton(rowIndex, index)"
+        >
+          {{ button.value }}
+        </button>
+        <div 
+          v-if="buttonsRow.toggleAllButton"
+          class="toggle_all_button"
+          @click="toggleAllButtons(rowIndex)"
+          :ref="'toggleButtons' + rowIndex"
+          :class="{active: buttonsRow.isToggleAllButtonEnabled}"
+        >
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </div>
     </div>
+    <!-- 
     <div class="nums_holder">
       <div 
         v-for="(numberItem, index) in numbersData" :key="index"
@@ -40,7 +63,7 @@
       ref="range"
       @input="refreshEquationsAmount()"
     >
-    <div class="range_value">{{ equationsAmount }}</div>
+    <div class="range_value">{{ equationsAmount }}</div> -->
 
   </div>
 </template>
@@ -53,8 +76,35 @@ export default {
   },
   data() {
     return {
-      
+      buttonsRows: [
+
+      ]
     }
+  },
+  mounted() {
+    console.log(this.inputsOptions);
+    this.initInputsObjects();
+    // // set nums data
+		// let defaultNums = [2, 3, 4, 5, 6, 7, 8, 9];
+		// for (let key in defaultNums) {
+		// 	let num = defaultNums[key];
+		// 	this.numbersData[key] = {num, isEnabled: false}
+		// 	if (num == 2) {
+		// 		this.numbersData[key].isEnabled = true;
+		// 	}
+		// }
+		// // set operations data
+		// this.operationsData = {
+		// 	multiplication: true,
+		// 	division: false
+		// }
+		// let that = this;
+		// document.addEventListener('keydown', function(e) {
+		// 	if (e.key == 'Enter') {
+		// 		that.processEnterInput();
+		// 	}
+		// });
+		// this.refreshEquationsAmount();
   },
   methods: {
     toggleOperation(op) {
@@ -68,31 +118,51 @@ export default {
 			}
 			this.refreshEquationsAmount();
 		},
-		toggleNumber(index) {
-			this.numbersData[index].isEnabled = !this.numbersData[index].isEnabled;
-			this.refreshEquationsAmount();
+		toggleButton(row, index) {
+      if(this.buttonsRows[row].type == 'multiplication_header') {
+        let buttons = this.buttonsRows[row].buttons;
+        buttons[index].isEnabled = !buttons[index].isEnabled;
+        if (buttons.every((button) => {
+          return !button.isEnabled;
+        })) {
+          if (index == 0) {
+            buttons[1].isEnabled = true;
+          } else {
+            buttons[0].isEnabled = true;
+          }
+        }
+        return;
+      }
+			this.buttonsRows[row].buttons[index].isEnabled = !this.buttonsRows[row].buttons[index].isEnabled;
+			// this.refreshEquationsAmount();
+      this.refreshToggleAllButton(row)
 		},
-		toggleAllNumbers() {
-			let button = this.$refs.toggleNumbersButton;
+		toggleAllButtons(rowIndex) {
 			let that = this;
+      let buttonsRow = this.buttonsRows[rowIndex];
 
-			button.classList.toggle('active');
-			
-			let nums = [2, 3, 4, 5, 6, 7, 8, 9];
+			let index = 0;
 			let curInterval = setInterval(function() {
-				let num = nums.shift();
-				let numItem = that.numbersData[num - 2];
-				if (button.classList.contains('active')) {
-					numItem.isEnabled = true;
+        let button = buttonsRow.buttons[index]
+				if (!buttonsRow.isToggleAllButtonEnabled) {
+					button.isEnabled = false;
 				} else {
-					numItem.isEnabled = false;
+					button.isEnabled = true;
 				}
-				that.refreshEquationsAmount();
-				if (nums.length == 0) {
+				// that.refreshEquationsAmount();
+				if (index == buttonsRow.buttons.length - 1) {
 					clearInterval(curInterval);
 				}
+				index += 1
 			}, 50);
+      buttonsRow.isToggleAllButtonEnabled = !buttonsRow.isToggleAllButtonEnabled;
 		},
+    refreshToggleAllButton(row) {
+      let buttonsRow = this.buttonsRows[row];
+      buttonsRow.isToggleAllButtonEnabled = buttonsRow.buttons.every((button) => {
+        return button.isEnabled;
+      })
+    },
 		refreshEquationsAmount() {
 			let rangeValues = [0.25, 0.5, 1, 2, 4];
 			this.rangeData.coefficient = rangeValues[this.$refs.range.value];
@@ -105,7 +175,25 @@ export default {
 
 			let defaultAmount = enabledNumbersAmount * enabledOperationsAmount * 8;
 			this.equationsAmount = rangeValues[this.$refs.range.value] * defaultAmount;
-		}
+		},
+    initInputsObjects() {
+      let inputsOptions = this.inputsOptions
+      for (let section of inputsOptions.buttonsSections) {
+        let buttonsRow = {
+          name: section.name,
+          type: section.type,
+          toggleAllButton: section.toggleAllButton,
+          isToggleAllButtonEnabled: false,
+          buttons: []
+        }
+        for (let value of section.values) {
+          buttonsRow.buttons.push({value, isEnabled: false});
+        }
+        buttonsRow.buttons[0].isEnabled = true;
+        console.log(this.buttonsRows);
+        this.buttonsRows.push(buttonsRow);
+      }
+    }
   },
 };
 </script>
