@@ -478,9 +478,10 @@ export default {
 						toggleAllButton: true
 					}
 				],
-				defaultRangeValues: true,
-				rangeValues: {min: 1, initialValue: 3, max: 5},
-				amountCoefficient: 8
+				isCoefficientBased: true,
+				rangeValues: [0.25, 0.5, 1, 2, 4],
+				// rangeValues: {min: 3, max: 15, step: 3}
+				coefficientValue: 8
 			}
 		},
 		toggleOperation(op) {

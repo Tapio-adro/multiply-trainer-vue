@@ -38,32 +38,15 @@
         </div>
       </div>
     </div>
-    <!-- 
-    <div class="nums_holder">
-      <div 
-        v-for="(numberItem, index) in numbersData" :key="index"
-        class="numbers"
-        @click="toggleNumber(index)"
-        :class="{active: numberItem.isEnabled}"
-      >
-        {{ numberItem.num }}
-      </div>
-      <div 
-        class="select_all_button"
-        @click="toggleAllNumbers()"
-        ref="toggleNumbersButton"
-      >
-        <div class="squares"></div>
-        <div class="squares"></div>
-        <div class="squares"></div>
-        <div class="squares"></div>
-      </div>
-    </div>
-    <input type="range" class="range" min="0" max="4" step="1" value="0"
-      ref="range"
+    <input type="range" class="slider" 
+      :min="sliderData.min" 
+      :max="sliderData.max" 
+      :step="sliderData.step" 
+      v-model="sliderData.value"
+      ref="slider"
       @input="refreshEquationsAmount()"
     >
-    <div class="range_value">{{ equationsAmount }}</div> -->
+    <div class="equations_amount">{{ equationsAmount }}</div>
 
   </div>
 </template>
@@ -76,9 +59,9 @@ export default {
   },
   data() {
     return {
-      buttonsRows: [
-
-      ]
+      buttonsRows: [],
+      sliderData: {},
+      equationsAmount: 0
     }
   },
   mounted() {
@@ -131,10 +114,11 @@ export default {
             buttons[0].isEnabled = true;
           }
         }
+			  this.refreshEquationsAmount();
         return;
       }
 			this.buttonsRows[row].buttons[index].isEnabled = !this.buttonsRows[row].buttons[index].isEnabled;
-			// this.refreshEquationsAmount();
+			this.refreshEquationsAmount();
       this.refreshToggleAllButton(row)
 		},
 		toggleAllButtons(rowIndex) {
@@ -149,7 +133,7 @@ export default {
 				} else {
 					button.isEnabled = true;
 				}
-				// that.refreshEquationsAmount();
+				that.refreshEquationsAmount();
 				if (index == buttonsRow.buttons.length - 1) {
 					clearInterval(curInterval);
 				}
@@ -164,17 +148,21 @@ export default {
       })
     },
 		refreshEquationsAmount() {
-			let rangeValues = [0.25, 0.5, 1, 2, 4];
-			this.rangeData.coefficient = rangeValues[this.$refs.range.value];
-
-			let enabledNumbersAmount = this.numbersData.filter(num => num.isEnabled).length;
-
-			let enabledOperationsAmount = 0;
-			enabledOperationsAmount += this.operationsData.division ? 1 : 0;
-			enabledOperationsAmount += this.operationsData.multiplication ? 1 : 0;
-
-			let defaultAmount = enabledNumbersAmount * enabledOperationsAmount * 8;
-			this.equationsAmount = rangeValues[this.$refs.range.value] * defaultAmount;
+      let inputsOptions = this.inputsOptions
+      let sliderData = this.sliderData
+      if (inputsOptions.isCoefficientBased) {
+			  this.sliderData.coefficient = this.inputsOptions.rangeValues[sliderData.value];
+        let equationsAmount = 1;
+        for (let buttonsRow of this.buttonsRows) {
+          equationsAmount *= buttonsRow.buttons.filter((button) => {
+            return button.isEnabled;
+          }).length;
+        }
+        equationsAmount *= this.sliderData.coefficient * inputsOptions.coefficientValue;
+        this.equationsAmount = equationsAmount;
+      } else {
+        this.equationsAmount = sliderData.value;
+      }
 		},
     initInputsObjects() {
       let inputsOptions = this.inputsOptions
@@ -193,6 +181,23 @@ export default {
         console.log(this.buttonsRows);
         this.buttonsRows.push(buttonsRow);
       }
+      let rangeValues = inputsOptions.rangeValues;
+      if (!inputsOptions.isCoefficientBased) {
+        this.sliderData = {
+          min: rangeValues.min,
+          max: rangeValues.max,
+          step: rangeValues.step,
+          value: rangeValues.min + (rangeValues.max - rangeValues.min) / 2
+        }
+      } else {
+        this.sliderData = {
+          min: 0,
+          max: rangeValues.length - 1,
+          step: 1,
+          value: Math.round(rangeValues.length / 2) - 1
+        }      
+      }
+      this.refreshEquationsAmount();
     }
   },
 };

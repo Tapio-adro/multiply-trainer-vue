@@ -106,7 +106,7 @@ body .inactive {
 #inputs .select_all_button.active .squares, #inputs .select_all_button.active div, #inputs .buttons_row .toggle_all_button.active .squares, #inputs .buttons_row .toggle_all_button.active div {
   background-color: #d9d9d9;
 }
-#inputs .range {
+#inputs .slider {
   -webkit-appearance: none;
      -moz-appearance: none;
           appearance: none;
@@ -121,10 +121,10 @@ body .inactive {
   margin: 30px 0;
   cursor: pointer;
 }
-#inputs .range:hover {
+#inputs .slider:hover {
   opacity: 1;
 }
-#inputs .range::-webkit-slider-thumb {
+#inputs .slider::-webkit-slider-thumb {
   -webkit-appearance: none;
           appearance: none;
   background-color: var(--green);
