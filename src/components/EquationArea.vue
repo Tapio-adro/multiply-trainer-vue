@@ -19,14 +19,7 @@ export default {
     trainingInProgress: Boolean,
     signLook: String
   },
-  data() {
-    return {
-
-    }
-  },
-  mounted() {
-
-  },
+  emits: ['update:answer', 'signClicked', 'update:equationText'],
   watch: {
     answer() {
       this.$emit('update:answer', this.answer);
@@ -45,7 +38,6 @@ export default {
       this.changeSignTo(this.signLook);
     }
   },
-  emits: ['update:answer', 'signClicked', 'update:equationText'],
   methods: {
     changeSignTo(type) {
 			let sign = this.$refs.sign;

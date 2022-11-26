@@ -63,9 +63,7 @@ export default {
       sliderData: {}
     }
   },
-  mounted() {
-    this.initInputsObjects();
-  },
+  emits: ['passInputsData', 'update:equationsAmount'],
   watch: {
     passInputs() {
       if(!this.passInputs) {
@@ -76,7 +74,9 @@ export default {
       } 
     }
   },
-  emits: ['passInputsData', 'update:equationsAmount'],
+  mounted() {
+    this.initInputsObjects();
+  },
   methods: {
     toggleOperation(op) {
 			this.operationsData[op] = !this.operationsData[op];

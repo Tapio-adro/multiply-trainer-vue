@@ -126,6 +126,11 @@ export default {
 			signLook: ''
 		}
 	},
+	watch: {
+		inputsEquationsAmount() {
+			this.equationsAmount = this.inputsEquationsAmount;
+		}
+	},
 	mounted() {
 		let that = this;
 		document.addEventListener('keydown', function(e) {
@@ -133,11 +138,6 @@ export default {
 				that.processEnterInput();
 			}
 		});
-	},
-	watch: {
-		inputsEquationsAmount() {
-			this.equationsAmount = this.inputsEquationsAmount;
-		}
 	},
 	methods: {
 		start() {
