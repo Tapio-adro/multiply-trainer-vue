@@ -65,27 +65,6 @@ export default {
   },
   mounted() {
     this.initInputsObjects();
-    // // set nums data
-		// let defaultNums = [2, 3, 4, 5, 6, 7, 8, 9];
-		// for (let key in defaultNums) {
-		// 	let num = defaultNums[key];
-		// 	this.numbersData[key] = {num, isEnabled: false}
-		// 	if (num == 2) {
-		// 		this.numbersData[key].isEnabled = true;
-		// 	}
-		// }
-		// // set operations data
-		// this.operationsData = {
-		// 	multiplication: true,
-		// 	division: false
-		// }
-		// let that = this;
-		// document.addEventListener('keydown', function(e) {
-		// 	if (e.key == 'Enter') {
-		// 		that.processEnterInput();
-		// 	}
-		// });
-		// this.refreshEquationsAmount();
   },
   watch: {
     passInputs() {
@@ -202,7 +181,8 @@ export default {
           min: 0,
           max: rangeValues.length - 1,
           step: 1,
-          value: Math.round(rangeValues.length / 2) - 1
+          value: 0
+          // value: Math.round(rangeValues.length / 2) - 1
         }      
       }
       this.refreshEquationsAmount();

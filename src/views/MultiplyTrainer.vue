@@ -1,20 +1,21 @@
 <template>
   <div class="main">
 		<div class="wrapper">
-			<inputs 
+			<Inputs 
 				:inputs-options="getInputsOptions()"
 				:pass-inputs="passInputs"
 				@passInputsData="getInputsData"
 				v-model:equationsAmount="inputsEquationsAmount"
 			/>
-			<div class="equations_amount">{{ getEquationsAmount }}</div>
-			<div id="equation_area" ref="equationArea">
-				<div class="equation_text" ref="equationText">{{ equationText }}</div>
-				<input type="number" class="answer_text hiden" ref="answerInput" v-model="answer">
-				<div class="sign start" @click="processEnterInput" ref="sign">
-					<div id="sign_start"></div>
-				</div>
-			</div>
+			<div class="equations_amount">{{ equationsAmount }}</div>
+			<EquationArea
+				ref="equationArea"
+				v-model:answer="answer"
+				v-model:equationText="equationText"
+				:trainingInProgress="trainingInProgress"
+				:signLook="signLook"
+				@signClicked="processEnterInput"
+			/>
 			<div v-auto-animate id="mistakes">
 				<div class="mistakes_header" ref="mistakesHeader">
 					<div class="mistake_cross"></div>
@@ -94,11 +95,13 @@
 
 <script>
 import Inputs from '../components/Inputs.vue'
+import EquationArea from '../components/EquationArea.vue'
 
 export default {
   name: "App",
 	components: {
-		Inputs
+		Inputs,
+		EquationArea
 	},
 	data() {
 		return {
@@ -113,13 +116,14 @@ export default {
 			equations: [],
 			curEquation: {},
 			equationText: '',
-			answer: '',
+			answer: 0,
 			maxPoints: 0,
 			curPoints: 0,
 			mistakes: [],
 			results: {},
 			canRecieveEnterInput: true,
-			passInputs: false
+			passInputs: false,
+			signLook: ''
 		}
 	},
 	mounted() {
@@ -130,27 +134,18 @@ export default {
 			}
 		});
 	},
-	computed: {
-		getEquationsAmount() {
-			if (this.trainingInProgress) {
-				return this.equationsAmount;
-			}
-			else {
-				return this.inputsEquationsAmount;
-			}
+	watch: {
+		inputsEquationsAmount() {
+			this.equationsAmount = this.inputsEquationsAmount;
 		}
 	},
 	methods: {
 		start() {
-			// make equation area border green 
-			this.$refs.equationArea.classList.toggle('active');
-			// show input to write there answer
-			this.toggleAnswerInput();
 			// form array of input value to be deconstructed for creating array of equations 
 			this.passInputs = true;
 			// change green sign with white triangle to smaller with
 			// white arrow, which allows to check answer for equation
-			this.changeSignTo('submit');
+			this.signLook = 'submit';
 			// save time, when training started
 			this.time.timeStart = new Date();
 			setTimeout(() => {
@@ -159,16 +154,14 @@ export default {
 		
 				this.maxPoints = this.equations.length;
 	
-				this.$refs.answerInput.focus();
-
 				this.showNextEquation();
 			}, 0)
 		},
 		processEnterInput() {
 			if (!this.canRecieveEnterInput) return;
 
-			let sign = this.$refs.sign;
-			if (!this.trainingInProgress){
+			let sign = this.$refs.equationArea.$refs.sign;
+			if (sign.classList.contains('start')){
 				this.trainingInProgress = true;
 				this.start();
 			} else if (sign.classList.contains('submit')) {
@@ -179,52 +172,15 @@ export default {
 				this.resetData();	
 			}
 		},
-		toggleAnswerInput(mode) {
-			let answerInput = this.$refs.answerInput;
-			answerInput.classList.toggle('hiden');
-			if (mode == 'none') {
-				setTimeout(() => {
-					answerInput.classList.toggle('none');
-					setTimeout(() => {
-						answerInput.classList.toggle('none');
-					}, 500)
-				}, 500)
-			}
-		},
-		changeSignTo(type) {
-			let sign = this.$refs.sign;
-			switch (type) {
-				case 'start':
-					sign.setAttribute('class', 'sign');
-					sign.classList.add(type);
-					sign.innerHTML = '<div id="sign_start"></div>';
-					break;
-				case 'submit':
-					sign.setAttribute('class', 'sign');
-					sign.classList.add(type);
-					sign.innerHTML = '⇨';
-					break;
-				case 'hiden':
-					sign.setAttribute('class', 'sign');
-					sign.classList.add(type);
-					sign.innerHTML = '';
-					break;
-				case 'reload':
-					sign.setAttribute('class', 'sign');
-					sign.classList.add('reload');
-					sign.innerHTML = '↻';
-					break;
-			}
-		},
 		showNextEquation() {
-			this.answer = '';
+			this.answer = null;
 			this.curEquation = this.equations.pop();
 			let equationString = getEquationString(this.curEquation);
 			if (this.curEquation.isFirst) {
 				this.showFirstEquation(equationString)
 				return;
 			}
-			this.changeEquationText(equationString);
+			this.$refs.equationArea.changeEquationText(equationString);
 		},
 		showFirstEquation(equationString) {
 			let chars = equationString.split('');
@@ -235,14 +191,6 @@ export default {
 					clearInterval(interval);
 				}
 			}, 10);
-		},
-		changeEquationText(str) {
-			this.$refs.equationText.classList.add('hiden');
-			let that = this;
-			setTimeout(function() {
-				that.equationText = str;
-				that.$refs.equationText.classList.remove('hiden');
-			}, 250);
 		},
 		checkAnswer() {
 			let answer = this.answer;
@@ -274,7 +222,7 @@ export default {
 				}
 			}
 			
-			this.$refs.answerInput.focus();
+			this.$refs.equationArea.$refs.answerInput.focus();
 
 			if (this.equations.length > 0) {
 				this.showNextEquation();
@@ -329,8 +277,8 @@ export default {
 			this.equations.splice(this.equations.length - 1, 0, newEquation);
 		},
 		hideElementsAndShowResults() {
-			this.$refs.equationArea.classList.toggle('active');
 			this.equationText = this.curPoints + ' / ' + this.maxPoints;
+			this.trainingInProgress = false;
 
 			this.time.trainingDuration = Math.round((new Date().getTime() - this.time.timeStart.getTime()) / 1000);
 			this.deactivateMistakesHeader();
@@ -343,10 +291,8 @@ export default {
 				behavior: "smooth"
 			});
 
-			this.changeSignTo('hiden');
-			this.toggleAnswerInput('none');
-			let that = this;
-			that.changeSignTo('reload');
+			this.signLook = 'hiden';
+			this.signLook = 'reload';
 		},
 		showResults() {
 			this.results = {
@@ -385,14 +331,14 @@ export default {
 			}, 1000)
 		},
 		resetData() {
-			this.changeSignTo('start');
+			this.equationsAmount = this.inputsEquationsAmount;
+			this.signLook = 'start';
 			this.equationText = '';
 			this.$refs.mistakesHeader.innerHTML = '<div class="mistake_cross"></div>';	
 			this.$refs.mistakesHeader.classList.remove('no_mistakes');
 			this.maxPoints = 0;
 			this.curPoints = 0;
 			this.passInputs = false;
-			this.trainingInProgress = false;
 			this.$refs.progressLine.style.width = '0%';
 			this.mistakes = [];
 		},
