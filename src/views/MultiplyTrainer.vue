@@ -138,6 +138,7 @@ export default {
 				that.processEnterInput();
 			}
 		});
+		this.processEnterInput();
 	},
 	methods: {
 		start() {
@@ -195,7 +196,7 @@ export default {
 		checkAnswer() {
 			let answer = this.answer;
 			let equation = this.curEquation;
-			let equationArea = this.$refs.equationArea;
+			let equationArea = this.$refs.equationArea.$refs.area;
 
 			if (!answer) {
 				return;

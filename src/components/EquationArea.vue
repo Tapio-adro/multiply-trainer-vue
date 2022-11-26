@@ -2,7 +2,7 @@
 
 <div id="equation_area" ref="area">
   <div class="equation_text" ref="equationText">{{ equationText }}</div>
-  <input type="number" class="answer_text hiden" ref="answerInput" v-model="answer">
+  <input type="number" class="answer_text hiden" ref="answerInput" v-model="answer" @input="checkInputValue">
   <div class="sign start" @click="this.$emit('signClicked')" ref="sign">
     <div id="sign_start"></div>
   </div>
@@ -14,16 +14,13 @@
 export default {
   name: "EquationArea",
   props: {
-    answer: Number,
+    answer: [Number, String],
     equationText: String,
     trainingInProgress: Boolean,
     signLook: String
   },
   emits: ['update:answer', 'signClicked', 'update:equationText'],
   watch: {
-    answer() {
-      this.$emit('update:answer', this.answer);
-    },
     trainingInProgress() {
       if (this.trainingInProgress) {
 			  this.$refs.area.classList.toggle('active');
@@ -36,6 +33,9 @@ export default {
     },
     signLook() {
       this.changeSignTo(this.signLook);
+    },
+    answer() {
+      this.$emit('update:answer', this.answer);
     }
   },
   methods: {
@@ -83,7 +83,13 @@ export default {
         that.$emit('update:equationText', str);
 				that.$refs.equationText.classList.remove('hiden');
 			}, 250);
-		}
+		},
+    checkInputValue(e) {
+      if (Number(this.answer) > 99) {
+        let elem = e.target;
+        elem.value = String(elem.value).slice(0, 2);
+      }
+    }
   },
 };
 </script>
