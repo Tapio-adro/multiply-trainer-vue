@@ -36,20 +36,22 @@ body
 
 
 #inputs
-  .header
-    font-size: 45px
+  #header
     display: flex
     align-self: center
     justify-content: center
-    user-select: none
     font-family: serif
-  .buttons_row div, .nums_holder
+    font-size: 45px
+    button
+      font-size: 45px
+      font-weight: normal
+  .buttons_row div
     max-width: 800px
     display: flex
     justify-content: center
     align-items: center
     flex-wrap: wrap
-  .numbers, .actionSign, .buttons_row div button
+  .buttons_row div button
     width: 50px
     height: 50px
     display: flex
@@ -66,7 +68,7 @@ body
     font-size: 16px
     &.active
       background-color: var(--green)
-  .select_all_button, .buttons_row .toggle_all_button
+  .buttons_row .toggle_all_button
     width: 50px
     height: 50px
     border-radius: 10px
@@ -79,12 +81,14 @@ body
     grid-template-rows: 1fr 1fr
     grid-gap: 8px
     padding: 8px
-    .squares, div
+    div
       background-color: var(--green)
       border-radius: 3px
+      width: 100%
+      height: 100%
     &.active
       background-color: var(--green)
-    &.active .squares, &.active div
+    &.active div
       background-color: #d9d9d9
   .slider
     appearance: none
@@ -106,16 +110,16 @@ body
       height: 40px
       width: 40px
       border-radius: 5px
-  .equations_amount
-    display: flex
-    justify-content: center
-    align-items: center
-    width: 150px
-    height: 50px
-    margin: 0 auto
-    box-sizing: border-box
-    border-radius: 10px
-    background-color: #d9d9d9
+.equations_amount
+  display: flex
+  justify-content: center
+  align-items: center
+  width: 150px
+  height: 50px
+  margin: 0 auto
+  box-sizing: border-box
+  border-radius: 10px
+  background-color: #d9d9d9
 
 #equation_area
   border: 15px solid #d9d9d9
@@ -388,11 +392,11 @@ body
       &::-webkit-slider-thumb
         height: 30px
         width: 30px
-    .equations_amount
-      width: 75px
-      height: 30px
-      border-radius: 5px
-      font-size: 15px
+  .equations_amount
+    width: 75px
+    height: 30px
+    border-radius: 5px
+    font-size: 15px
 
   #equation_area
     border-width: 10px

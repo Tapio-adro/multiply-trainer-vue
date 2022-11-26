@@ -1,49 +1,13 @@
 <template>
   <div class="main">
 		<div class="wrapper">
-			<inputs :inputs-options="getInputsOptions()" ref="inputElems"/>
-			<div id="inputs" ref="inputElems">
-				<div class="header">
-					<span 
-						id="multiplication" 
-						class="actionSign"
-						:class="{active: operationsData.multiplication}"
-						@click="toggleOperation('multiplication')"
-					>×</span> 
-					& 
-					<span 
-						id="division" 
-						class="actionSign"
-						:class="{active: operationsData.division}"
-						@click="toggleOperation('division')"
-					>÷</span>
-				</div>
-				<div class="nums_holder">
-					<div 
-						v-for="(numberItem, index) in numbersData" :key="index"
-						class="numbers"
-						@click="toggleNumber(index)"
-						:class="{active: numberItem.isEnabled}"
-					>
-						{{ numberItem.num }}
-					</div>
-					<div 
-						class="select_all_button"
-						@click="toggleAllNumbers()"
-						ref="toggleNumbersButton"
-					>
-						<div class="squares"></div>
-						<div class="squares"></div>
-						<div class="squares"></div>
-						<div class="squares"></div>
-					</div>
-				</div>
-				<input type="range" class="range" min="0" max="4" step="1" value="0"
-					ref="range"
-					@input="refreshEquationsAmount()"
-				>
-				<div class="equations_amount">{{ equationsAmount }}</div>
-			</div>
+			<inputs 
+				:inputs-options="getInputsOptions()"
+				:pass-inputs="passInputs"
+				@passInputsData="getInputsData"
+				v-model:equationsAmount="inputsEquationsAmount"
+			/>
+			<div class="equations_amount">{{ getEquationsAmount }}</div>
 			<div id="equation_area" ref="equationArea">
 				<div class="equation_text" ref="equationText">{{ equationText }}</div>
 				<input type="number" class="answer_text hiden" ref="answerInput" v-model="answer">
@@ -138,14 +102,12 @@ export default {
 	},
 	data() {
 		return {
-			numbersData: [],
-			operationsData: {},
-			rangeData: {},
 			inputValues: [],
 			time: {
 				timeStart: null,
 				trainingDuration: 0
 			},
+			inputsEquationsAmount: 0,
 			equationsAmount: 0,
 			trainingInProgress: false,
 			equations: [],
@@ -156,54 +118,51 @@ export default {
 			curPoints: 0,
 			mistakes: [],
 			results: {},
-			canRecieveEnterInput: true
+			canRecieveEnterInput: true,
+			passInputs: false
 		}
 	},
 	mounted() {
-		// set nums data
-		let defaultNums = [2, 3, 4, 5, 6, 7, 8, 9];
-		for (let key in defaultNums) {
-			let num = defaultNums[key];
-			this.numbersData[key] = {num, isEnabled: false}
-			if (num == 2) {
-				this.numbersData[key].isEnabled = true;
-			}
-		}
-		// set operations data
-		this.operationsData = {
-			multiplication: true,
-			division: false
-		}
 		let that = this;
 		document.addEventListener('keydown', function(e) {
 			if (e.key == 'Enter') {
 				that.processEnterInput();
 			}
 		});
-		this.refreshEquationsAmount();
+	},
+	computed: {
+		getEquationsAmount() {
+			if (this.trainingInProgress) {
+				return this.equationsAmount;
+			}
+			else {
+				return this.inputsEquationsAmount;
+			}
+		}
 	},
 	methods: {
 		start() {
-			// make all input buttons uninteractable
-			this.$refs.inputElems.classList.add('inactive');
 			// make equation area border green 
 			this.$refs.equationArea.classList.toggle('active');
 			// show input to write there answer
 			this.toggleAnswerInput();
+			// form array of input value to be deconstructed for creating array of equations 
+			this.passInputs = true;
 			// change green sign with white triangle to smaller with
 			// white arrow, which allows to check answer for equation
 			this.changeSignTo('submit');
 			// save time, when training started
 			this.time.timeStart = new Date();
-			// refresh equations amount
-			this.refreshEquationsAmount();
-			// form array of input value to be deconstructed for creating array of equations 
-			this.prepareInputValues();
-			this.equations = createEquationsList(...this.inputValues);
+			setTimeout(() => {
+				this.equations = createEquationsList(...this.inputValues);
+				this.equationsAmount = this.equations.length;
+		
+				this.maxPoints = this.equations.length;
+	
+				this.$refs.answerInput.focus();
 
-			this.maxPoints = this.equations.length;
-
-			this.$refs.answerInput.focus();
+				this.showNextEquation();
+			}, 0)
 		},
 		processEnterInput() {
 			if (!this.canRecieveEnterInput) return;
@@ -212,7 +171,6 @@ export default {
 			if (!this.trainingInProgress){
 				this.trainingInProgress = true;
 				this.start();
-				this.showNextEquation();
 			} else if (sign.classList.contains('submit')) {
 				this.checkAnswer();
 			} else if (this.$refs.resultsElem.classList.contains("full")) {
@@ -257,29 +215,6 @@ export default {
 					sign.innerHTML = '↻';
 					break;
 			}
-		},
-		prepareInputValues() {
-			let numbers = [];
-			for (let numItem of this.numbersData) {
-				if (numItem.isEnabled) {
-					numbers.push(numItem.num);
-				}
-			}
-			if (numbers.length == 0) {
-				numbers = [2];
-				this.numbersData[0].isEnabled = true;
-				this.refreshEquationsAmount();
-			}
-			let operations = [];
-			if (this.operationsData.multiplication) {
-				operations.push('×');
-			}
-			if (this.operationsData.division) {
-				operations.push('÷');
-			}
-			let coefficient = this.rangeData.coefficient;
-			this.inputValues = [numbers, operations, coefficient];
-			console.log(this.inputValues);
 		},
 		showNextEquation() {
 			this.answer = '';
@@ -456,11 +391,10 @@ export default {
 			this.$refs.mistakesHeader.classList.remove('no_mistakes');
 			this.maxPoints = 0;
 			this.curPoints = 0;
-			this.$refs.inputElems.classList.remove('inactive');
+			this.passInputs = false;
 			this.trainingInProgress = false;
 			this.$refs.progressLine.style.width = '0%';
 			this.mistakes = [];
-			this
 		},
 		getInputsOptions () {
 			return {
@@ -484,54 +418,8 @@ export default {
 				coefficientValue: 8
 			}
 		},
-		toggleOperation(op) {
-			this.operationsData[op] = !this.operationsData[op];
-			if (!Object.values(this.operationsData).some(value => value)) {
-				if (op == 'multiplication') {
-					this.operationsData['division'] = true;
-				} else {
-					this.operationsData['multiplication'] = true;
-				}
-			}
-			this.refreshEquationsAmount();
-		},
-		toggleNumber(index) {
-			this.numbersData[index].isEnabled = !this.numbersData[index].isEnabled;
-			this.refreshEquationsAmount();
-		},
-		toggleAllNumbers() {
-			let button = this.$refs.toggleNumbersButton;
-			let that = this;
-
-			button.classList.toggle('active');
-			
-			let nums = [2, 3, 4, 5, 6, 7, 8, 9];
-			let curInterval = setInterval(function() {
-				let num = nums.shift();
-				let numItem = that.numbersData[num - 2];
-				if (button.classList.contains('active')) {
-					numItem.isEnabled = true;
-				} else {
-					numItem.isEnabled = false;
-				}
-				that.refreshEquationsAmount();
-				if (nums.length == 0) {
-					clearInterval(curInterval);
-				}
-			}, 50);
-		},
-		refreshEquationsAmount() {
-			let rangeValues = [0.25, 0.5, 1, 2, 4];
-			this.rangeData.coefficient = rangeValues[this.$refs.range.value];
-
-			let enabledNumbersAmount = this.numbersData.filter(num => num.isEnabled).length;
-
-			let enabledOperationsAmount = 0;
-			enabledOperationsAmount += this.operationsData.division ? 1 : 0;
-			enabledOperationsAmount += this.operationsData.multiplication ? 1 : 0;
-
-			let defaultAmount = enabledNumbersAmount * enabledOperationsAmount * 8;
-			this.equationsAmount = rangeValues[this.$refs.range.value] * defaultAmount;
+		getInputsData(inputsData) {
+			this.inputValues = inputsData;
 		}
 	},
 };
@@ -629,7 +517,7 @@ export default {
 
 // external functions
 
-function createEquationsList(indexes, actions, coefficient) {
+function createEquationsList(actions, indexes, coefficient) {
 	let defaultNums = [2, 3, 4, 5, 6, 7, 8, 9];
 
 	let result = generateBaseArray();

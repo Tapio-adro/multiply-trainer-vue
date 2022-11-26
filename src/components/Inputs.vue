@@ -1,10 +1,10 @@
 <template>
-  <div id="inputs">
+  <div id="inputs" ref="inputElems">
     <div class="buttons_row"
       v-for="(buttonsRow, rowIndex) in buttonsRows" :key="rowIndex"
     >
       <div v-if="buttonsRow.type == 'multiplication_header'">
-        <div class="header">
+        <div id="header">
           <button 
             :class="{active: buttonsRow.buttons[0].isEnabled}"
             @click="toggleButton(rowIndex, 0)"
@@ -46,8 +46,6 @@
       ref="slider"
       @input="refreshEquationsAmount()"
     >
-    <div class="equations_amount">{{ equationsAmount }}</div>
-
   </div>
 </template>
 
@@ -55,17 +53,17 @@
 export default {
   name: "Inputs",
   props: {
-    inputsOptions: Object
+    inputsOptions: Object,
+    passInputs: Boolean,
+    equationsAmount: Number
   },
   data() {
     return {
       buttonsRows: [],
-      sliderData: {},
-      equationsAmount: 0
+      sliderData: {}
     }
   },
   mounted() {
-    console.log(this.inputsOptions);
     this.initInputsObjects();
     // // set nums data
 		// let defaultNums = [2, 3, 4, 5, 6, 7, 8, 9];
@@ -89,6 +87,17 @@ export default {
 		// });
 		// this.refreshEquationsAmount();
   },
+  watch: {
+    passInputs() {
+      if(!this.passInputs) {
+        this.$refs.inputElems.classList.remove('inactive');
+      } else {
+        this.$refs.inputElems.classList.add('inactive');
+        this.passInputsToParent();
+      } 
+    }
+  },
+  emits: ['passInputsData', 'update:equationsAmount'],
   methods: {
     toggleOperation(op) {
 			this.operationsData[op] = !this.operationsData[op];
@@ -159,9 +168,9 @@ export default {
           }).length;
         }
         equationsAmount *= this.sliderData.coefficient * inputsOptions.coefficientValue;
-        this.equationsAmount = equationsAmount;
+        this.$emit('update:equationsAmount', equationsAmount);
       } else {
-        this.equationsAmount = sliderData.value;
+        this.$emit('update:equationsAmount', sliderData.value);
       }
 		},
     initInputsObjects() {
@@ -178,7 +187,6 @@ export default {
           buttonsRow.buttons.push({value, isEnabled: false});
         }
         buttonsRow.buttons[0].isEnabled = true;
-        console.log(this.buttonsRows);
         this.buttonsRows.push(buttonsRow);
       }
       let rangeValues = inputsOptions.rangeValues;
@@ -198,6 +206,31 @@ export default {
         }      
       }
       this.refreshEquationsAmount();
+    },
+    passInputsToParent() {
+      for (let buttonsRow of this.buttonsRows) {
+        if(!buttonsRow.buttons.some((button) => {
+          return button.isEnabled;
+        })) {
+          buttonsRow.buttons[0].isEnabled = true;
+        } 
+      }
+      this.refreshEquationsAmount();
+      let inputsData = [];
+      for (let row of this.buttonsRows) {
+        let valuesArray = row.buttons.filter((button) => {
+          return button.isEnabled;
+        }).map((button) => {
+          return button.value;
+        })
+        inputsData.push(valuesArray);
+      }
+      if (this.inputsOptions.isCoefficientBased) {
+        inputsData.push(this.sliderData.coefficient);
+      } else {
+        inputsData.push(this.sliderData.value);
+      }
+      this.$emit('passInputsData', inputsData)
     }
   },
 };

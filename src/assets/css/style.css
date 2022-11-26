@@ -42,25 +42,25 @@ body .inactive {
   padding: 30px 0;
 }
 
-#inputs .header {
-  font-size: 45px;
+#inputs #header {
   display: flex;
   align-self: center;
   justify-content: center;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
   font-family: serif;
+  font-size: 45px;
 }
-#inputs .buttons_row div, #inputs .nums_holder {
+#inputs #header button {
+  font-size: 45px;
+  font-weight: normal;
+}
+#inputs .buttons_row div {
   max-width: 800px;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
 }
-#inputs .numbers, #inputs .actionSign, #inputs .buttons_row div button {
+#inputs .buttons_row div button {
   width: 50px;
   height: 50px;
   display: flex;
@@ -79,10 +79,10 @@ body .inactive {
   border: none;
   font-size: 16px;
 }
-#inputs .numbers.active, #inputs .actionSign.active, #inputs .buttons_row div button.active {
+#inputs .buttons_row div button.active {
   background-color: var(--green);
 }
-#inputs .select_all_button, #inputs .buttons_row .toggle_all_button {
+#inputs .buttons_row .toggle_all_button {
   width: 50px;
   height: 50px;
   border-radius: 10px;
@@ -96,14 +96,16 @@ body .inactive {
   grid-gap: 8px;
   padding: 8px;
 }
-#inputs .select_all_button .squares, #inputs .select_all_button div, #inputs .buttons_row .toggle_all_button .squares, #inputs .buttons_row .toggle_all_button div {
+#inputs .buttons_row .toggle_all_button div {
   background-color: var(--green);
   border-radius: 3px;
+  width: 100%;
+  height: 100%;
 }
-#inputs .select_all_button.active, #inputs .buttons_row .toggle_all_button.active {
+#inputs .buttons_row .toggle_all_button.active {
   background-color: var(--green);
 }
-#inputs .select_all_button.active .squares, #inputs .select_all_button.active div, #inputs .buttons_row .toggle_all_button.active .squares, #inputs .buttons_row .toggle_all_button.active div {
+#inputs .buttons_row .toggle_all_button.active div {
   background-color: #d9d9d9;
 }
 #inputs .slider {
@@ -132,7 +134,8 @@ body .inactive {
   width: 40px;
   border-radius: 5px;
 }
-#inputs .equations_amount {
+
+.equations_amount {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -469,7 +472,7 @@ body .inactive {
     height: 30px;
     width: 30px;
   }
-  #inputs .equations_amount {
+  .equations_amount {
     width: 75px;
     height: 30px;
     border-radius: 5px;
