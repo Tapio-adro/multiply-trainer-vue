@@ -16,19 +16,10 @@
 				:signLook="signLook"
 				@signClicked="processEnterInput"
 			/>
-			<div v-auto-animate id="mistakes">
-				<div class="mistakes_header" ref="mistakesHeader">
-					<div class="mistake_cross"></div>
-				</div>
-				<div v-auto-animate class="mistakes_area">
-					<div 
-						v-for="(mistake, index) in mistakes" :key="index"
-						:class="{solved: mistake.state == 'solved', failed: mistake.state == 'failed'}"
-					>
-						{{ mistake.text }}
-					</div>
-				</div>
-			</div>
+			<MistakesMT
+				ref="mistakes"
+				:mistakes="mistakes"
+			/>		
 		</div>
 	</div>
 	<div id="results" ref="resultsElem">
@@ -96,11 +87,13 @@
 <script>
 import Inputs from '../components/Inputs.vue'
 import EquationArea from '../components/EquationArea.vue'
+import MistakesMT from '../components/MistakesMT.vue'
 
 export default {
   name: "App",
 	components: {
 		Inputs,
+		MistakesMT,
 		EquationArea
 	},
 	data() {
@@ -138,7 +131,7 @@ export default {
 				that.processEnterInput();
 			}
 		});
-		this.processEnterInput();
+		// processEnterInput();
 	},
 	methods: {
 		start() {
@@ -204,7 +197,7 @@ export default {
 				if (equation.type == 'normal') {
 					this.equationsAmount--;
 					this.curPoints++;
-					this.deactivateMistakesHeader();
+					this.$refs.mistakes.deactivateMistakesHeader();
 				} else {
 					this.changeMistakeStateTo('solved');
 				}
@@ -215,7 +208,7 @@ export default {
 				}, 250);
 				if (equation.type == 'normal') {
 					this.equationsAmount--;
-					this.addMistakeContainer();
+					this.addMistake();
 					this.addAdditionalEquationToList();
 					equationArea.scrollIntoView({behavior: 'smooth'});
 				} else {
@@ -232,22 +225,13 @@ export default {
 			}
 			
 		},
-		addMistakeContainer() {
+		addMistake() {
 			let mistake = {
 				text: getEquationString(this.curEquation, 'full'),
 				state: 'neutral'
 			}
 			this.mistakes.push(mistake);
-			let mistakesAmount = this.mistakes.length;
-			if (mistakesAmount == 1) {
-				this.$refs.mistakesHeader.classList.add('active');
-			} else {
-				this.$refs.mistakesHeader.classList.add('active');
-				this.$refs.mistakesHeader.innerHTML += '<div class="mistake_cross"></div>';
-			}
-			if (mistakesAmount > 6) {
-				this.mistakes.shift();
-			}
+			this.$refs.mistakes.mistakeAdded();
 		},
 		changeMistakeStateTo(type) {
 			for (let mistake of this.mistakes) {
@@ -256,14 +240,6 @@ export default {
 					mistake.state = type;
 					return;
 				}
-			}
-		},
-		deactivateMistakesHeader() {
-			let uncorrectedMistakes = this.mistakes.filter((mistake) => {
-				return mistake.state == 'neutral';
-			});
-			if (uncorrectedMistakes.length == 0) {
-				this.$refs.mistakesHeader.classList.remove('active');
 			}
 		},
 		checkNoMistakes() {
@@ -282,7 +258,7 @@ export default {
 			this.trainingInProgress = false;
 
 			this.time.trainingDuration = Math.round((new Date().getTime() - this.time.timeStart.getTime()) / 1000);
-			this.deactivateMistakesHeader();
+			this.$refs.mistakes.deactivateMistakesHeader();
 			this.checkNoMistakes();
 
 			this.showResults();

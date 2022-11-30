@@ -28,7 +28,7 @@ export default {
 				this.$refs.answerInput.focus();
       } else {
         this.$refs.area.classList.toggle('active');
-			  this.toggleAnswerInput('none');
+			  this.toggleAnswerInput();
       }
     },
     signLook() {
@@ -64,17 +64,9 @@ export default {
 					break;
 			}
 		},
-    toggleAnswerInput(mode) {
+    toggleAnswerInput() {
 			let answerInput = this.$refs.answerInput;
 			answerInput.classList.toggle('hiden');
-			if (mode == 'none') {
-				setTimeout(() => {
-					answerInput.classList.toggle('none');
-					setTimeout(() => {
-						answerInput.classList.toggle('none');
-					}, 500)
-				}, 500)
-			}
 		},
     changeEquationText(str) {
 			this.$refs.equationText.classList.add('hiden');
