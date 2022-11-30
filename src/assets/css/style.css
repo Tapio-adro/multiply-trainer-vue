@@ -42,16 +42,21 @@ body .inactive {
   padding: 30px 0;
 }
 
-#inputs #header {
+#inputs .header {
   display: flex;
   align-self: center;
   justify-content: center;
   font-family: serif;
   font-size: 45px;
 }
-#inputs #header button {
+#inputs .header button {
   font-size: 45px;
   font-weight: normal;
+}
+#inputs .buttons_row.header button {
+  font-family: serif;
+  font-weight: normal;
+  font-size: 45px;
 }
 #inputs .buttons_row div {
   max-width: 800px;
@@ -189,9 +194,6 @@ body .inactive {
   width: 0;
   padding: 0;
   border-width: 0;
-}
-#equation_area .answer_text.none {
-  display: none;
 }
 
 #equation_area .sign {
@@ -437,15 +439,6 @@ body .inactive {
   #inputs .header {
     font-size: 35px;
     margin-bottom: 10px;
-  }
-  #inputs .numbers {
-    font-size: 15px;
-    width: 35px;
-    height: 35px;
-    border-radius: 7px;
-    margin: 2.5px 2.5px;
-  }
-  #inputs .actionSign {
     font-size: 15px;
     width: 35px;
     height: 35px;
@@ -453,7 +446,14 @@ body .inactive {
     margin: 2.5px 2.5px;
     font-size: 35px;
   }
-  #inputs .select_all_button {
+  #inputs .buttons_row div button {
+    font-size: 15px;
+    width: 35px;
+    height: 35px;
+    border-radius: 7px;
+    margin: 2.5px 2.5px;
+  }
+  #inputs .toggle_all_button {
     width: 35px;
     height: 35px;
     border-radius: 7px;

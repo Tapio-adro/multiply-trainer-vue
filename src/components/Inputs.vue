@@ -1,20 +1,20 @@
 <template>
   <div id="inputs" ref="inputElems">
-    <div class="buttons_row"
+    <div 
       v-for="(buttonsRow, rowIndex) in buttonsRows" :key="rowIndex"
+      class="buttons_row"
+      :class="{header: buttonsRow.type == 'header'}"
     >
-      <div v-if="buttonsRow.type == 'multiplication_header'">
-        <div id="header">
-          <button 
-            :class="{active: buttonsRow.buttons[0].isEnabled}"
-            @click="toggleButton(rowIndex, 0)"
-          >×</button> 
-          & 
-          <button 
-          :class="{active: buttonsRow.buttons[1].isEnabled}"
-            @click="toggleButton(rowIndex, 1)"
-          >÷</button>
-        </div>
+      <div v-if="buttonsRow.subType == 'multiplication_header'">
+        <button 
+          :class="{active: buttonsRow.buttons[0].isEnabled}"
+          @click="toggleButton(rowIndex, 0)"
+        >×</button> 
+        & 
+        <button 
+        :class="{active: buttonsRow.buttons[1].isEnabled}"
+          @click="toggleButton(rowIndex, 1)"
+        >÷</button>
       </div>
       <div v-else>
         <button 
@@ -158,12 +158,14 @@ export default {
         let buttonsRow = {
           name: section.name,
           type: section.type,
+          subType: section.subType,
           toggleAllButton: section.toggleAllButton,
           isToggleAllButtonEnabled: false,
           buttons: []
         }
         for (let value of section.values) {
-          buttonsRow.buttons.push({value, isEnabled: false});
+          let isEnabled = section.areAllEnabled ? true : false;
+          buttonsRow.buttons.push({value, isEnabled});
         }
         buttonsRow.buttons[0].isEnabled = true;
         this.buttonsRows.push(buttonsRow);
@@ -174,7 +176,7 @@ export default {
           min: rangeValues.min,
           max: rangeValues.max,
           step: rangeValues.step,
-          value: rangeValues.min + (rangeValues.max - rangeValues.min) / 2
+          value: rangeValues.value
         }
       } else {
         this.sliderData = {
@@ -183,7 +185,7 @@ export default {
           step: 1,
           value: 0
           // value: Math.round(rangeValues.length / 2) - 1
-        }      
+        }    
       }
       this.refreshEquationsAmount();
     },

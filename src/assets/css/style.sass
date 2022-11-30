@@ -36,7 +36,7 @@ body
 
 
 #inputs
-  #header
+  .header
     display: flex
     align-self: center
     justify-content: center
@@ -45,6 +45,10 @@ body
     button
       font-size: 45px
       font-weight: normal
+  .buttons_row.header button
+    font-family: serif
+    font-weight: normal
+    font-size: 45px
   .buttons_row div
     max-width: 800px
     display: flex
@@ -360,20 +364,21 @@ body
     .header
       font-size: 35px
       margin-bottom: 10px 
-    .numbers
-      font-size: 15px
-      width: 35px
-      height: 35px
-      border-radius: 7px
-      margin: 2.5px 2.5px
-    .actionSign
+      
       font-size: 15px
       width: 35px
       height: 35px
       border-radius: 7px
       margin: 2.5px 2.5px
       font-size: 35px
-    .select_all_button
+    .buttons_row div button
+      font-size: 15px
+      width: 35px
+      height: 35px
+      border-radius: 7px
+      margin: 2.5px 2.5px
+
+    .toggle_all_button
       width: 35px
       height: 35px
       border-radius: 7px

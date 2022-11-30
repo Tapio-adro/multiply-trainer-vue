@@ -28,27 +28,6 @@
 		</div>
 	</div>
 	<div id="darkBg" ref="darkBg"></div>
-
-	<!-- <div id="buttons_holder">
-		<div id="ref_button" class="top_button">?</div>
-		<div id="colors_container" class="top_button">
-			<div class="color_container" style="background-color: #66ff66"></div>
-			<div class="color_container" style="background-color: #ff6666"></div>
-			<div class="color_container" style="background-color: #66ffff"></div>
-			<div class="color_container" style="background-color: #ffff66"></div>
-		</div>
-		<div id="link_holder">
-			<div class="top_button" id="linkToFraction">
-				<div class="fract">
-					<div class="numer">1</div>
-					<div class="denom" style="border-top: 2px solid rgb(0, 0, 0)">2</div>
-				</div>
-			</div>
-			<div id="shrink_link_wrapper" class="hiden">
-				<div id="shrink_link_container"></div>
-			</div>
-		</div>
-	</div> -->
 </template>
 
 <script>
@@ -58,7 +37,7 @@ import EquationArea from '../components/EquationArea.vue'
 import MistakesMT from '../components/MistakesMT.vue'
 
 export default {
-  name: "MultiplyTrainer",
+  name: "FractionTrainer",
 	components: {
 		Results,
 		Inputs,
@@ -295,22 +274,14 @@ export default {
 				buttonsSections: [
 					{
 						type: 'header',
-						subType: 'multiplication_header',
 						name: 'operations', 
-						values: ['×', '÷'], 
-						toggleAllButton: false
-					},
-					{
-						type: 'default',
-						name: 'numbers', 
-						values: [2, 3, 4, 5, 6, 7, 8, 9], 
-						toggleAllButton: true
+						values: ['+', '−', '×', '÷'], 
+						toggleAllButton: false,
+						areAllEnabled: true
 					}
 				],
-				isCoefficientBased: true,
-				rangeValues: [0.25, 0.5, 1, 2, 4],
-				// rangeValues: {min: 3, max: 15, step: 3}
-				coefficientValue: 8
+				isCoefficientBased: false,
+				rangeValues: {min: 3, max: 15, step: 3, value: 6}
 			}
 		},
 		getInputsData(inputsData) {
@@ -319,182 +290,6 @@ export default {
 	},
 };
 
-// let colorButton;
-// let colorsHolder;
-// let colorButtons;
-
-// let canChangeColor = false;
-
-// setTimeout(() => {
-// 	colorButton = document.querySelector('#color_button');
-// 	colorsHolder = document.querySelector('#colors_container');
-// 	colorButtons = document.querySelectorAll('.color_container');
-// 	shrinkLink = document.querySelector('#shrink_link_wrapper');
-// 	linkToFractionButton = document.querySelector('#linkToFraction');
-// 	linkToMainButton = document.querySelector('#linkToMain');
-// 	refButton = document.querySelector('#ref_button');
-// 	refWrapper = document.querySelector('.ref_wrapper');
-// 	activateColorButtons();
-// 	// if (linkToFractionButton) {
-// 	// 	linkToFractionButton.addEventListener('click', ev => {
-// 	// 		if (linkToFractionButton.classList.contains('active')) {
-// 	// 			window.location.href = "./fraction/index.html";
-// 	// 		} else {
-// 	// 			linkToFractionButton.classList.add('active');
-// 	// 			linkToFractionButton.innerHTML = 'Тренажер дробів';
-// 	// 			shrinkLink.classList.remove('hiden');
-// 	// 		}
-// 	// 	})
-// 	// 	shrinkLink.addEventListener('click', ev => {
-// 	// 		if (!shrinkLink.classList.contains('hiden')) {
-// 	// 			shrinkLink.classList.add('hiden');
-// 	// 			linkToFractionButton.innerHTML = '<div class="fract"> <div class="numer">1</div> <div class="denom" style="border-top: 2px solid rgb(0, 0, 0)">2</div> </div>';
-// 	// 			linkToFractionButton.classList.remove('active');
-// 	// 		}
-// 	// 	})
-// 	// } else {
-// 	// 	linkToMainButton.addEventListener('click', ev => {
-// 	// 		if (linkToMainButton.classList.contains('active')) {
-// 	// 			window.location.href = "../index.html";
-// 	// 		} else {
-// 	// 			linkToMainButton.classList.add('active');
-// 	// 			linkToMainButton.innerHTML = 'Тренажер множення';
-// 	// 			shrinkLink.classList.remove('hiden');
-// 	// 		}
-// 	// 	})
-// 	// 	shrinkLink.addEventListener('click', ev => {
-// 	// 		if (!shrinkLink.classList.contains('hiden')) {
-// 	// 			shrinkLink.classList.add('hiden');
-// 	// 			linkToMainButton.innerHTML = '2 × 2';
-// 	// 			linkToMainButton.classList.remove('active');
-// 	// 		}
-// 	// 	})
-// 	// }
-// 	// refButton.addEventListener('click', ev => {
-// 	// 	refButton.classList.toggle('active');
-// 	// 	refWrapper.classList.toggle('hiden');
-// 	// })
-	
-	
-	
-// 	// document.addEventListener('keydown', function(e) {
-// 	// if (refButton.classList.contains('active') && e.key == 'Escape') {
-// 	// 	refButton.classList.toggle('active');
-// 	// 	refWrapper.classList.toggle('hiden');	
-// 	// 	}
-// 	// });
-	
-// 	// colorsHolder.addEventListener('click', ev => {
-// 	// 	if (!canChangeColor) {
-// 	// 		colorsHolder.classList.toggle('active');
-// 	// 		setTimeout(() => {
-// 	// 			canChangeColor = true;
-// 	// 		}, 500)
-// 	// 	}
-// 	// })
-// }, 1000)
-
-// function activateColorButtons () {
-// 	for (let button of colorButtons) {
-// 		button.addEventListener('click', ev => {
-// 			if (canChangeColor) {
-// 				let color = button.style.backgroundColor;
-// 				document.documentElement.style.setProperty('--green', color);
-// 				colorsHolder.classList.toggle('active');
-// 				setTimeout(() => {
-// 					canChangeColor = false;
-// 				}, 0)
-// 			}
-// 		})
-// 	}
-// }
-
-
-// external functions
-
-function createEquationsList(actions, indexes, coefficient) {
-	let defaultNums = [2, 3, 4, 5, 6, 7, 8, 9];
-
-	let result = generateBaseArray();
-
-	checkBiggerCoefficient();
-
-	result = shuffle(result);
-
-	checkSmallerCoefficient();
-
-	result[result.length - 1].isFirst = true;
-
-	return result;
-
-	function generateBaseArray() {
-		let result = [];
-		for (let index of indexes) {
-			for (let num of defaultNums) {
-				if (actions.indexOf('×') != -1) {
-					result.push({
-						num1: num, 
-						num2: index, 
-						answer: num * index, 
-						type: 'normal',
-						sign: '×',
-						isFirst: false});
-				}
-				if (actions.indexOf('÷') != -1) {
-					result.push({
-						num1: num * index, 
-						num2: index, 
-						answer: num, 
-						type: 'normal',
-						sign: '÷',
-						isFirst: false});
-				}	
-			}
-		}
-		return result;
-	}
-
-	function checkBiggerCoefficient() {
-		if (coefficient > 1) {
-			for (let i = coefficient; i > 1; i /= 2) {
-				let newArr = [];
-				for (let i = 0; i < result.length; i++) {
-					newArr.push(Object.assign({}, result[i]));
-				}
-				result.push(...newArr);
-			}
-		}
-	}
-
-	function checkSmallerCoefficient() {
-		if (coefficient < 1) {
-			result = result.slice(0, result.length * coefficient)
-		}
-	}
-
-	function shuffle(arr) {
-		let result = [];
-		while (arr.length != 0) {
-			result.push(...arr.splice(random(arr), 1));
-		}
-		return result;
-	}
-
-	function random(arr) {
-		return Math.floor(Math.random() * arr.length);
-	}
-}
-function getEquationString(equation, mode='default') {
-	let modes = {
-		default: function(equation) {
-			return equation.num1 + ' ' + equation.sign + ' ' + equation.num2 + ' = ';
-		},
-		full: function(equation) {
-			return equation.num1 + ' ' + equation.sign + ' ' + equation.num2 + ' = ' + equation.answer;
-		}
-	}
-	return modes[mode](equation);
-}
 function getDuration (duration, mode = 'default', maxPoints = 0) {
 	let sec = duration;
 
