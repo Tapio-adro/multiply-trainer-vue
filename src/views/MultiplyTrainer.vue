@@ -20,44 +20,11 @@
 				ref="mistakes"
 				:mistakes="mistakes"
 			/>		
-		</div>
-	</div>
-	<div id="results" ref="resultsElem">
-		<div id="results_inner">
-			<div id="results_content" ref="resultsContent">
-				<section>
-					<h2>Результат</h2>
-					<h3>Оцінка: {{ results.mark }}</h3>
-					<div class="progress_bar">
-						<div class="progress_line" ref="progressLine"></div>
-					</div>
-					<h3 class="progress_percent">{{ results.percent }}</h3>
-				</section>
-				<section>
-					<h2>Статистика</h2>
-					<table>
-						<tr>
-							<td>Всього прикладів:</td>
-							<td>{{ maxPoints }}</td>
-						</tr>
-						<tr>
-							<td>Правильних відповідей:</td>
-							<td>{{ curPoints }}</td>
-						</tr>
-						<tr>
-							<td>Час виконання:</td>
-							<td>{{ results.duration }}</td>
-						</tr>
-						<tr>
-							<td class="lastTd">Середній час виконання одного виразу:</td>
-							<td class="lastTd">{{ results.durationAverage }}</td>
-						</tr>
-					</table>
-				</section>
-				<div class="buttonHolder">
-					<div class="acceptButton" @click="processEnterInput">✓</div>
-				</div>
-			</div>
+			<Results
+				ref="results"
+				:results="results"
+				@accept="processEnterInput"
+			/>	
 		</div>
 	</div>
 	<div id="darkBg" ref="darkBg"></div>
@@ -86,12 +53,14 @@
 
 <script>
 import Inputs from '../components/Inputs.vue'
+import Results from '../components/Results.vue'
 import EquationArea from '../components/EquationArea.vue'
 import MistakesMT from '../components/MistakesMT.vue'
 
 export default {
   name: "App",
 	components: {
+		Results,
 		Inputs,
 		MistakesMT,
 		EquationArea
@@ -160,7 +129,7 @@ export default {
 				this.start();
 			} else if (sign.classList.contains('submit')) {
 				this.checkAnswer();
-			} else if (this.$refs.resultsElem.classList.contains("full")) {
+			} else if (this.$refs.results.$refs.resultsElem.classList.contains("full")) {
 				this.hideResults();
 			} else if (sign.classList.contains('reload')) {
 				this.resetData();	
@@ -244,7 +213,7 @@ export default {
 		},
 		checkNoMistakes() {
 			if (this.curPoints == this.maxPoints) {
-				this.$refs.mistakesHeader.classList.toggle('no_mistakes');
+				this.$refs.mistakes.$refs.mistakesHeader.classList.toggle('no_mistakes');
 			}
 		},
 		addAdditionalEquationToList() {
@@ -276,11 +245,13 @@ export default {
 				mark: Math.round(this.curPoints / this.maxPoints * 12),
 				percent: Math.round(this.curPoints / this.maxPoints * 10000) / 100  + '%',
 				duration: getDuration(this.time.trainingDuration),
-				durationAverage: getDuration(this.time.trainingDuration, 'average', this.maxPoints)
+				durationAverage: getDuration(this.time.trainingDuration, 'average', this.maxPoints),
+				maxPoints: this.maxPoints,
+				curPoints: this.curPoints
 			}
 
-			let resultsContent = this.$refs.resultsContent;
-			let resultsElem = this.$refs.resultsElem;
+			let resultsContent = this.$refs.results.$refs.resultsContent;
+			let resultsElem = this.$refs.results.$refs.resultsElem;
 			resultsContent.classList.add("hiden");
 			this.canRecieveEnterInput = false;
 			setTimeout(() => {
@@ -291,13 +262,13 @@ export default {
 					resultsContent.classList.remove("hiden");
 					this.canRecieveEnterInput = true;
 					setTimeout(() => {
-						this.$refs.progressLine.style.width = (this.curPoints / this.maxPoints * 100) + '%';
+						this.$refs.results.$refs.progressLine.style.width = (this.curPoints / this.maxPoints * 100) + '%';
 					}, 500)
 				}, 500)
 			}, 500)
 		},
 		hideResults() {
-			let resultsElem = this.$refs.resultsElem;
+			let resultsElem = this.$refs.results.$refs.resultsElem;
 			this.$refs.darkBg.classList.toggle('active');
 			resultsElem.classList.add('hiden');
 			this.canRecieveEnterInput = false;
@@ -311,12 +282,12 @@ export default {
 			this.equationsAmount = this.inputsEquationsAmount;
 			this.signLook = 'start';
 			this.equationText = '';
-			this.$refs.mistakesHeader.innerHTML = '<div class="mistake_cross"></div>';	
-			this.$refs.mistakesHeader.classList.remove('no_mistakes');
+			this.$refs.mistakes.$refs.mistakesHeader.innerHTML = '<div class="mistake_cross"></div>';	
+			this.$refs.mistakes.$refs.mistakesHeader.classList.remove('no_mistakes');
 			this.maxPoints = 0;
 			this.curPoints = 0;
 			this.passInputs = false;
-			this.$refs.progressLine.style.width = '0%';
+			this.$refs.results.$refs.progressLine.style.width = '0%';
 			this.mistakes = [];
 		},
 		getInputsOptions () {
