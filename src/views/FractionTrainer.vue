@@ -106,6 +106,9 @@ export default {
 			this.time.timeStart = new Date();
 			setTimeout(() => {
 				this.equations = createEquationsList(...this.inputValues);
+				this.equations.forEach(eq => {
+					console.log(eq.answer);
+				});
 
 				this.equationsAmount = this.equations.length;
 		
@@ -118,16 +121,23 @@ export default {
 			if (!this.canRecieveEnterInput) return;
 
 			let sign = this.$refs.equationArea.$refs.sign;
+			console.log(sign);
 			if (sign.classList.contains('start')){
 				this.trainingInProgress = true;
 				this.start();
 			} else if (sign.classList.contains('submit')) {
 				this.checkAnswer();
+			} else if (sign.classList.contains('accept')) {
+				if (document.documentElement.scrollTop > 20) {
+					this.$refs.toTopButton.scrollToTop();
+				} else {
+					this.hideElementsAndShowResults();
+				}
 			} else if (this.$refs.results.$refs.resultsElem.classList.contains("full")) {
 				this.hideResults();
 			} else if (sign.classList.contains('reload')) {
-				this.resetData();	
-			}
+				this.resetData();		
+			} 
 		},
 		showNextEquation() {
 			this.answer = null;
@@ -141,6 +151,7 @@ export default {
 			let mistake = false;
 			let answer = this.answer;
 			let equation = this.curEquation;
+
 			if (!answer) {
 				return;
 			} else {
@@ -151,7 +162,7 @@ export default {
 					// showCheckmark();
 				} else {
 					mistake = true;
-					this.showAnswerAndExplanations();
+					this.showExplanations();
 
 					equationArea.classList.toggle('mistake');
 					setTimeout(function() {
@@ -167,12 +178,14 @@ export default {
 				if (!mistake) {
 					this.hideElementsAndShowResults();
 				} else {
-					// lastEquation = true;
+					this.signLook = 'accept';					
+					this.equationText = '';
+					this.trainingInProgress = false;
 				}
 			}
 
 		},
-		showAnswerAndExplanations () {
+		showExplanations () {
 			let explanationsWrapper = document.createElement('div');
 			let fullEquationContainer = document.createElement('div');
 			let explanationsContainer = document.createElement('div');
@@ -189,12 +202,13 @@ export default {
 			fullEquationContainer.appendChild(equationDiv);
 
 			explanationsContainer.innerHTML = this.curEquation.explanations;
-
-			this.$refs.mistakes.$el.after(explanationsWrapper);
+			
+			this.$refs.mistakes.$refs.mistakes_container.appendChild(explanationsWrapper);
 
 			// if (equations.length == 0) {
 			// 	toTopButton.innerHTML = '✓';
 			// }
+			this.$refs.mistakes.mistakeAdded();
 			let that = this;
 			setTimeout(() => {
 				explanationsWrapper.scrollIntoView({behavior: "smooth"});
@@ -223,7 +237,6 @@ export default {
 				behavior: "smooth"
 			});
 
-			this.signLook = 'hiden';
 			this.signLook = 'reload';
 		},
 		showResults() {
@@ -270,6 +283,7 @@ export default {
 			this.equationText = '';
 			this.$refs.mistakes.$refs.mistakesHeader.innerHTML = '<div class="mistake_cross"></div>';	
 			this.$refs.mistakes.$refs.mistakesHeader.classList.remove('no_mistakes');
+			this.$refs.mistakes.$refs.mistakes_container.innerHTML = '';
 			this.maxPoints = 0;
 			this.curPoints = 0;
 			this.passInputs = false;
@@ -288,7 +302,7 @@ export default {
 					}
 				],
 				isCoefficientBased: false,
-				rangeValues: {min: 3, max: 12, step: 3, value: 6}
+				rangeValues: {min: 3, max: 12, step: 3, value: 3}
 			}
 		},
 		getInputsData(inputsData) {

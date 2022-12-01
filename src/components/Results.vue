@@ -33,7 +33,7 @@
 				</table>
 			</section>
 			<div class="buttonHolder">
-				<div class="acceptButton" @click="emit('accept')">✓</div>
+				<div class="acceptButton" @click="$emit('accept')">✓</div>
 			</div>
 		</div>
 	</div>

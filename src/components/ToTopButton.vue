@@ -1,5 +1,5 @@
 <template>
-	<div id="to_top_wrapper" class="hiden" @click="srollToTop">
+	<div id="to_top_wrapper" class="hiden" @click="scrollToTop">
 		<button id="to_top_container" ref="button">
 			<div id="to_top_button"></div>
 		</button>
@@ -18,7 +18,7 @@ export default {
     }
   },
   methods: {
-		srollToTop() {
+		scrollToTop() {
 			window.scrollTo({
 				top: 0,
 				behavior: "smooth"

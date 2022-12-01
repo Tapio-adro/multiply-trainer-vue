@@ -64,8 +64,13 @@ export default {
 					break;
 				case 'reload':
 					sign.setAttribute('class', 'sign');
-					sign.classList.add('reload');
+					sign.classList.add(type);
 					sign.innerHTML = '↻';
+					break;
+        case 'accept':
+					sign.setAttribute('class', 'sign');
+					sign.classList.add(type);
+					sign.innerHTML = '✓';
 					break;
 			}
 		},

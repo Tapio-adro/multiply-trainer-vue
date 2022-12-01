@@ -149,7 +149,7 @@ export default {
         equationsAmount *= this.sliderData.coefficient * inputsOptions.coefficientValue;
         this.$emit('update:equationsAmount', equationsAmount);
       } else {
-        this.$emit('update:equationsAmount', sliderData.value);
+        this.$emit('update:equationsAmount', Number(sliderData.value));
       }
 		},
     initInputsObjects() {

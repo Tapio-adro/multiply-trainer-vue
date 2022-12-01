@@ -135,6 +135,7 @@ body
   justify-content: center
   align-items: center
   transition: 1s
+  background-color: #fff
   &.active
     border-color: var(--green)
   &.mistake
@@ -196,6 +197,12 @@ body
     border-radius: 50%
     font-weight: bold
     font-size: 36px
+  &.accept
+    width: 60px
+    height: 60px
+    border-radius: 10px
+    font-weight: bold
+    font-size: 36px
   #sign_start
     clip-path: polygon(5% 2%, 5% 100%, 90% 50%)
     background-color: #fff
@@ -211,18 +218,18 @@ body
   display: flex
   justify-content: center
   flex-direction: row
-  margin: 10px 0
-  &.active .mistake_cross
-    background-color: var(--red)
-  &.no_mistakes .mistake_cross
-    background-color: var(--green)
+  margin: 10px 0 25px
   .mistake_cross
     clip-path: polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%)
     background-color: var(--gray)
     height: 40px
     width: 40px
-    margin-right: 10px
+    margin-right: 0 5px
     transition: 1s
+  &.active .mistake_cross
+    background-color: var(--red)
+  &.no_mistakes .mistake_cross
+    background-color: var(--green)
 #mistakes .mistakes_area
   max-width: 800px
   width: 100%
