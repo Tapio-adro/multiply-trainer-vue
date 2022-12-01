@@ -14,12 +14,16 @@
 				v-model:equationText="equationText"
 				:trainingInProgress="trainingInProgress"
 				:signLook="signLook"
+				:displayRawHTML="true"
 				@signClicked="processEnterInput"
 			/>
-			<MistakesMT
+			<MistakesFT
 				ref="mistakes"
 				:mistakes="mistakes"
 			/>		
+			<ToTopButton
+				ref="toTopButton"
+			/>
 			<Results
 				ref="results"
 				:results="results"
@@ -32,17 +36,19 @@
 
 <script>
 import Inputs from '../components/Inputs.vue'
-import Results from '../components/Results.vue'
 import EquationArea from '../components/EquationArea.vue'
-import MistakesMT from '../components/MistakesMT.vue'
+import MistakesFT from '../components/MistakesFT.vue'
+import ToTopButton from '../components/ToTopButton.vue'
+import Results from '../components/Results.vue'
 
 export default {
   name: "FractionTrainer",
 	components: {
-		Results,
 		Inputs,
-		MistakesMT,
-		EquationArea
+		EquationArea,
+		MistakesFT,
+		ToTopButton,
+		Results
 	},
 	data() {
 		return {
@@ -79,6 +85,14 @@ export default {
 				that.processEnterInput();
 			}
 		});
+		window.onscroll = function() {checkScrolling()};
+		function checkScrolling() {
+			if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+				that.$refs.toTopButton.$el.classList.remove('hiden');
+			} else {
+				that.$refs.toTopButton.$el.classList.add('hiden');
+			}
+		}
 		// processEnterInput();
 	},
 	methods: {
@@ -92,6 +106,7 @@ export default {
 			this.time.timeStart = new Date();
 			setTimeout(() => {
 				this.equations = createEquationsList(...this.inputValues);
+
 				this.equationsAmount = this.equations.length;
 		
 				this.maxPoints = this.equations.length;
@@ -117,89 +132,81 @@ export default {
 		showNextEquation() {
 			this.answer = null;
 			this.curEquation = this.equations.pop();
-			let equationString = getEquationString(this.curEquation);
-			if (this.curEquation.isFirst) {
-				this.showFirstEquation(equationString)
-				return;
-			}
+			let equationString = this.curEquation.partial;
 			this.$refs.equationArea.changeEquationText(equationString);
 		},
-		showFirstEquation(equationString) {
-			let chars = equationString.split('');
-			let that = this;
-			let interval = setInterval(function() {
-				that.equationText += chars.shift();
-				if (chars.length == 0) {
-					clearInterval(interval);
-				}
-			}, 10);
-		},
 		checkAnswer() {
-			let answer = this.answer;
-			let equation = this.curEquation;
 			let equationArea = this.$refs.equationArea.$refs.area;
 
+			let mistake = false;
+			let answer = this.answer;
+			let equation = this.curEquation;
 			if (!answer) {
 				return;
-			} else if (answer == equation.answer) {
-				if (equation.type == 'normal') {
-					this.equationsAmount--;
+			} else {
+				if (answer == equation.answer) {
 					this.curPoints++;
 					this.$refs.mistakes.deactivateMistakesHeader();
+					this.$refs.equationArea.$refs.answerInput.focus();
+					// showCheckmark();
 				} else {
-					this.changeMistakeStateTo('solved');
-				}
-			} else {
-				equationArea.classList.toggle('mistake');
-				setTimeout(function() {
+					mistake = true;
+					this.showAnswerAndExplanations();
+
 					equationArea.classList.toggle('mistake');
-				}, 250);
-				if (equation.type == 'normal') {
-					this.equationsAmount--;
-					this.addMistake();
-					this.addAdditionalEquationToList();
-					equationArea.scrollIntoView({behavior: 'smooth'});
-				} else {
-					this.changeMistakeStateTo('failed');
+					setTimeout(function() {
+						equationArea.classList.toggle('mistake');
+					}, 250)
 				}
+				this.equationsAmount--;
 			}
-			
-			this.$refs.equationArea.$refs.answerInput.focus();
 
 			if (this.equations.length > 0) {
 				this.showNextEquation();
 			} else {
-				this.hideElementsAndShowResults();
-			}
-			
-		},
-		addMistake() {
-			let mistake = {
-				text: getEquationString(this.curEquation, 'full'),
-				state: 'neutral'
-			}
-			this.mistakes.push(mistake);
-			this.$refs.mistakes.mistakeAdded();
-		},
-		changeMistakeStateTo(type) {
-			for (let mistake of this.mistakes) {
-				if (mistake.text == getEquationString(this.curEquation, 'full') 
-					&& mistake.state == 'neutral') {
-					mistake.state = type;
-					return;
+				if (!mistake) {
+					this.hideElementsAndShowResults();
+				} else {
+					// lastEquation = true;
 				}
 			}
+
+		},
+		showAnswerAndExplanations () {
+			let explanationsWrapper = document.createElement('div');
+			let fullEquationContainer = document.createElement('div');
+			let explanationsContainer = document.createElement('div');
+			explanationsWrapper.className = 'explanations_wrapper';
+			fullEquationContainer.className = 'full_equation';
+			explanationsContainer.className = 'explanations_container';
+			explanationsWrapper.appendChild(fullEquationContainer);
+			explanationsWrapper.appendChild(explanationsContainer);
+
+			let equationDiv = document.createElement('div');
+			equationDiv.className = 'equation_with_answer';
+			equationDiv.innerHTML = this.curEquation.full;
+
+			fullEquationContainer.appendChild(equationDiv);
+
+			explanationsContainer.innerHTML = this.curEquation.explanations;
+
+			this.$refs.mistakes.$el.after(explanationsWrapper);
+
+			// if (equations.length == 0) {
+			// 	toTopButton.innerHTML = '✓';
+			// }
+			let that = this;
+			setTimeout(() => {
+				explanationsWrapper.scrollIntoView({behavior: "smooth"});
+				setTimeout(() => {
+					that.$refs.toTopButton.focus();
+				}, 500)
+			}, 500)
 		},
 		checkNoMistakes() {
 			if (this.curPoints == this.maxPoints) {
 				this.$refs.mistakes.$refs.mistakesHeader.classList.toggle('no_mistakes');
 			}
-		},
-		addAdditionalEquationToList() {
-			let newEquation = this.curEquation;
-			newEquation.type = 'additional';
-			newEquation.isFirst = false;
-			this.equations.splice(this.equations.length - 1, 0, newEquation);
 		},
 		hideElementsAndShowResults() {
 			this.equationText = this.curPoints + ' / ' + this.maxPoints;
@@ -281,7 +288,7 @@ export default {
 					}
 				],
 				isCoefficientBased: false,
-				rangeValues: {min: 3, max: 15, step: 3, value: 6}
+				rangeValues: {min: 3, max: 12, step: 3, value: 6}
 			}
 		},
 		getInputsData(inputsData) {

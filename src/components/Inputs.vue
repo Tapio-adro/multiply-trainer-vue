@@ -198,6 +198,7 @@ export default {
         } 
       }
       this.refreshEquationsAmount();
+
       let inputsData = [];
       for (let row of this.buttonsRows) {
         let valuesArray = row.buttons.filter((button) => {
