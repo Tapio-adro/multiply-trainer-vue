@@ -83,9 +83,26 @@ body .inactive {
   z-index: 1;
   border: none;
   font-size: 16px;
+  border-width: 4px 0;
+  border-top-color: white;
+  border-bottom-color: #a6a6a6;
+  border-style: solid;
+  border-right-width: 0;
+  border-left-width: 0;
+  border-bottom-width: 3px;
+  border-top-width: 0;
+}
+#inputs .buttons_row div button:active {
+  border-bottom-width: 0;
+  border-top-width: 3px;
+  transition: 0s;
+}
+#inputs .buttons_row div button:hover {
+  opacity: 0.8;
 }
 #inputs .buttons_row div button.active {
   background-color: var(--green);
+  border-bottom-color: lime;
 }
 #inputs .buttons_row .toggle_all_button {
   width: 50px;
@@ -220,11 +237,38 @@ body .inactive {
   color: white;
   cursor: pointer;
   transition: 0.5s;
+  border-style: solid;
+  border-right-width: 0;
+  border-left-width: 0;
+  border-bottom-width: 3px;
+  border-top-width: 0;
+  border-bottom-color: lime;
+}
+#equation_area .sign:active {
+  border-bottom-width: 0;
+  border-top-width: 3px;
+  transition: 0s;
+}
+#equation_area .sign:hover {
+  opacity: 0.8;
 }
 #equation_area .sign.start {
   border-radius: 10px;
   width: 120px;
   height: 80px;
+  border-style: solid;
+  border-right-width: 0;
+  border-left-width: 0;
+  border-bottom-width: 5px;
+  border-top-width: 0;
+}
+#equation_area .sign.start:active {
+  border-bottom-width: 0;
+  border-top-width: 5px;
+  transition: 0s;
+}
+#equation_area .sign.start:hover {
+  opacity: 0.8;
 }
 #equation_area .sign.submit {
   border-radius: 5px;
@@ -545,6 +589,9 @@ sup, sub {
   background-color: var(--green);
   width: 60%;
   height: 70%;
+}
+#to_top_button:focus {
+  border: 1px solid #000;
 }
 
 @media (max-width: 600px) {

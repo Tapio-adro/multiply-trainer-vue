@@ -4,9 +4,9 @@
   <div v-if="displayRawHTML" class="equation_text fraction" ref="equationText" v-html="equationText"></div>
   <div v-else class="equation_text" ref="equationText">{{ equationText }}</div>
   <input type="number" class="answer_text hiden" ref="answerInput" v-model="answer" @input="checkInputValue">
-  <div class="sign start" @click="this.$emit('signClicked')" ref="sign">
+  <button class="sign start" @click="this.$emit('signClicked')" ref="sign">
     <div id="sign_start"></div>
-  </div>
+  </button>
 </div>
 
 </template>
