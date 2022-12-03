@@ -3,7 +3,7 @@
 		<div class="mistakes_header" ref="mistakesHeader">
 			<div class="mistake_cross"></div>
 		</div>
-		<div ref="mistakes_container"></div>
+		<div ref="explanations_container"></div>
 	</div>
 </template>
 

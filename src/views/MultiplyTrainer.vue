@@ -309,7 +309,6 @@ export default {
 				],
 				isCoefficientBased: true,
 				rangeValues: [0.25, 0.5, 1, 2, 4],
-				// rangeValues: {min: 3, max: 15, step: 3}
 				coefficientValue: 8
 			}
 		},

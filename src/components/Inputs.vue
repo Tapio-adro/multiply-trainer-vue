@@ -90,7 +90,7 @@ export default {
 			this.refreshEquationsAmount();
 		},
 		toggleButton(row, index) {
-      if(this.buttonsRows[row].type == 'multiplication_header') {
+      if(this.buttonsRows[row].subType == 'multiplication_header') {
         let buttons = this.buttonsRows[row].buttons;
         buttons[index].isEnabled = !buttons[index].isEnabled;
         if (buttons.every((button) => {

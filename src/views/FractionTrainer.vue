@@ -121,7 +121,6 @@ export default {
 			if (!this.canRecieveEnterInput) return;
 
 			let sign = this.$refs.equationArea.$refs.sign;
-			console.log(sign);
 			if (sign.classList.contains('start')){
 				this.trainingInProgress = true;
 				this.start();
@@ -189,9 +188,9 @@ export default {
 			let explanationsWrapper = document.createElement('div');
 			let fullEquationContainer = document.createElement('div');
 			let explanationsContainer = document.createElement('div');
-			explanationsWrapper.className = 'explanations_wrapper';
-			fullEquationContainer.className = 'full_equation';
-			explanationsContainer.className = 'explanations_container';
+			explanationsWrapper.className = 'explanation_wrapper';
+			fullEquationContainer.className = 'equation_wrapper';
+			explanationsContainer.className = 'explanation_container';
 			explanationsWrapper.appendChild(fullEquationContainer);
 			explanationsWrapper.appendChild(explanationsContainer);
 
@@ -203,7 +202,7 @@ export default {
 
 			explanationsContainer.innerHTML = this.curEquation.explanations;
 			
-			this.$refs.mistakes.$refs.mistakes_container.appendChild(explanationsWrapper);
+			this.$refs.mistakes.$refs.explanations_container.appendChild(explanationsWrapper);
 
 			// if (equations.length == 0) {
 			// 	toTopButton.innerHTML = '✓';
@@ -283,7 +282,7 @@ export default {
 			this.equationText = '';
 			this.$refs.mistakes.$refs.mistakesHeader.innerHTML = '<div class="mistake_cross"></div>';	
 			this.$refs.mistakes.$refs.mistakesHeader.classList.remove('no_mistakes');
-			this.$refs.mistakes.$refs.mistakes_container.innerHTML = '';
+			this.$refs.mistakes.$refs.explanations_container.innerHTML = '';
 			this.maxPoints = 0;
 			this.curPoints = 0;
 			this.passInputs = false;
