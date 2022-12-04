@@ -141,7 +141,7 @@ body
       height: 40px
       width: 40px
       border-radius: 5px
-.equations_amount
+#equations_amount
   display: flex
   justify-content: center
   align-items: center
@@ -158,12 +158,23 @@ body
   margin: 20px 0
   max-width: 800px
   height: 200px
-  display: flex
-  justify-content: center
-  align-items: center
   transition: 1s
   background-color: #fff
   padding: 10px
+  display: flex
+  justify-content: center
+  align-items: center
+  .inner
+    display: flex
+    justify-content: center
+    align-items: center
+    width: 100%
+    height: 100%
+  .inner.hiden
+    opacity: 0
+    transition: 0.25s
+  .inner.none
+    display: none
   &.active
     border-color: var(--green)
   &.mistake
@@ -197,6 +208,22 @@ body
     width: 0
     padding: 0
     border-width: 0
+  .checkmark
+    width: 60px
+    height: 60px
+    border-radius: 10px
+    font-weight: bold
+    font-size: 45px
+    color: var(--green)
+    border: none
+    display: flex
+    justify-content: center
+    align-items: center
+    &.hiden
+      opacity: 0
+      transition: 0.25s
+    &.none
+      display: none
 #equation_area .sign
   display: flex
   justify-content: center
@@ -307,11 +334,11 @@ body
     border-radius: 10px 
     margin-bottom: 7px 
     object-fit: scale-down
-  .explanations_container 
+  .explanation_container 
     margin-top: 20px 
     li 
-      font-size: 1.5rem 
-      margin-bottom: 15px 
+      font-size: 1.2rem 
+      margin-bottom: 10px 
       width: 100% 
   .equation_container 
     display: flex 
@@ -513,7 +540,7 @@ body
       &::-webkit-slider-thumb
         height: 30px
         width: 30px
-  .equations_amount
+  #equations_amount
     width: 75px
     height: 30px
     border-radius: 5px
@@ -584,10 +611,10 @@ body
       padding: 7px 
       border-radius: 7px 
       margin-bottom: 5px 
-    .explanations_container 
+    .explanation_container 
       margin-top: 20px 
       ol 
-        padding-left: 25px 
+        padding-left: 25px
       li 
         font-size: 15px 
         margin-bottom: 15px 

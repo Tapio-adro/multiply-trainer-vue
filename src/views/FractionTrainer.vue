@@ -7,13 +7,13 @@
 				@passInputsData="getInputsData"
 				v-model:equationsAmount="inputsEquationsAmount"
 			/>
-			<div class="equations_amount">{{ equationsAmount }}</div>
+			<div id="equations_amount">{{ equationsAmount }}</div>
 			<EquationArea
 				ref="equationArea"
 				v-model:answer="answer"
 				v-model:equationText="equationText"
 				:trainingInProgress="trainingInProgress"
-				:signLook="signLook"
+				v-model:signLook="signLook"
 				:displayRawHTML="true"
 				@signClicked="processEnterInput"
 			/>
@@ -114,11 +114,11 @@ export default {
 		
 				this.maxPoints = this.equations.length;
 	
-				this.showNextEquation();
+				this.showNextEquation(true);
 			}, 0)
 		},
 		processEnterInput() {
-			if (!this.canRecieveEnterInput) return;
+			if (!this.canRecieveEnterInput || this.$refs.toTopButton.$refs.button == document.activeElement) return;
 
 			let sign = this.$refs.equationArea.$refs.sign;
 			if (sign.classList.contains('start')){
@@ -138,11 +138,11 @@ export default {
 				this.resetData();		
 			} 
 		},
-		showNextEquation() {
+		showNextEquation(hasMistaken) {
 			this.answer = null;
 			this.curEquation = this.equations.pop();
 			let equationString = this.curEquation.partial;
-			this.$refs.equationArea.changeEquationText(equationString);
+			this.$refs.equationArea.changeEquationText(equationString, !hasMistaken);
 		},
 		checkAnswer() {
 			let equationArea = this.$refs.equationArea.$refs.area;
@@ -152,6 +152,7 @@ export default {
 			let equation = this.curEquation;
 
 			if (!answer) {
+				this.$refs.equationArea.$refs.answerInput.focus();
 				return;
 			} else {
 				if (answer == equation.answer) {
@@ -172,7 +173,7 @@ export default {
 			}
 
 			if (this.equations.length > 0) {
-				this.showNextEquation();
+				this.showNextEquation(mistake);
 			} else {
 				if (!mistake) {
 					this.hideElementsAndShowResults();
@@ -202,7 +203,7 @@ export default {
 
 			explanationsContainer.innerHTML = this.curEquation.explanations;
 			
-			this.$refs.mistakes.$refs.explanations_container.appendChild(explanationsWrapper);
+			this.$refs.mistakes.$refs.explanations_container.prepend(explanationsWrapper);
 
 			// if (equations.length == 0) {
 			// 	toTopButton.innerHTML = '✓';

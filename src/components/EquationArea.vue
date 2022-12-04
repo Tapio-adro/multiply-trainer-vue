@@ -1,12 +1,17 @@
 <template>
 
 <div id="equation_area" ref="area">
-  <div v-if="displayRawHTML" class="equation_text fraction" ref="equationText" v-html="equationText"></div>
-  <div v-else class="equation_text" ref="equationText">{{ equationText }}</div>
-  <input type="number" class="answer_text hiden" ref="answerInput" v-model="answer" @input="checkInputValue">
-  <button class="sign start" @click="this.$emit('signClicked')" ref="sign">
-    <div id="sign_start"></div>
-  </button>
+  <div ref="inner" class="inner">
+    <div v-if="displayRawHTML" class="equation_text fraction" ref="equationText" v-html="equationText"></div>
+    <div v-else class="equation_text" ref="equationText">{{ equationText }}</div>
+    <input type="number" class="answer_text hiden" ref="answerInput" v-model="answer" @input="checkInputValue">
+    <button class="sign start" @click="this.$emit('signClicked')" ref="sign">
+      <div id="sign_start"></div>
+    </button>
+  </div>
+  <div class="checkmark hiden none" ref="checkmark">
+    <i class="fa fa-check" aria-hidden="true"></i>
+  </div>
 </div>
 
 </template>
@@ -24,7 +29,7 @@ export default {
       type: Boolean
     }
   },
-  emits: ['update:answer', 'signClicked', 'update:equationText'],
+  emits: ['update:answer', 'signClicked', 'update:equationText', 'update:signLook'],
   watch: {
     trainingInProgress() {
       if (this.trainingInProgress) {
@@ -72,13 +77,38 @@ export default {
 					sign.classList.add(type);
 					sign.innerHTML = '✓';
 					break;
+        case 'checkmark':
+					sign.setAttribute('class', 'sign');
+					sign.classList.add(type);
+					sign.innerHTML = '<i class="fa fa-check" aria-hidden="true"></i>';
+					break;
 			}
 		},
     toggleAnswerInput() {
 			let answerInput = this.$refs.answerInput;
 			answerInput.classList.toggle('hiden');
 		},
-    changeEquationText(str) {
+    changeEquationText(str, rightAnswer = false) {
+      if (rightAnswer) {
+        this.$refs.inner.classList.add('hiden');
+        let that = this;
+        setTimeout(() => {
+          that.$refs.inner.classList.add('none');
+          that.$refs.checkmark.classList.remove('none');
+          that.$refs.checkmark.classList.remove('hiden');
+          setTimeout(() => {
+            that.$refs.checkmark.classList.add('hiden');
+            setTimeout(() => {
+              that.$refs.checkmark.classList.add('none');
+              that.$refs.inner.classList.remove('none');
+              that.$refs.inner.classList.remove('hiden');
+              that.$emit('update:equationText', str);
+					    this.$refs.answerInput.focus();
+            }, 250)
+          }, 500)
+        }, 250)
+        return;
+      }
 			this.$refs.equationText.classList.add('hiden');
 			let that = this;
 			setTimeout(function() {

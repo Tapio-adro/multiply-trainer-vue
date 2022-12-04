@@ -7,7 +7,7 @@
 				@passInputsData="getInputsData"
 				v-model:equationsAmount="inputsEquationsAmount"
 			/>
-			<div class="equations_amount">{{ equationsAmount }}</div>
+			<div id="equations_amount">{{ equationsAmount }}</div>
 			<EquationArea
 				ref="equationArea"
 				v-model:answer="answer"
