@@ -1,16 +1,11 @@
 import { createRouter, createWebHistory } from "vue-router";
-import HomeView from "../views/HomeView.vue";
 import MultiplyTrainer from "../views/MultiplyTrainer.vue";
 import FractionTrainer from "../views/FractionTrainer.vue";
+import EquationTrainer from "../views/EquationTrainer.vue";
 
 const routes = [
   {
     path: "/",
-    name: "home",
-    component: HomeView
-  },
-  {
-    path: "/multiply-trainer",
     name: "multiply-trainer",
     component: MultiplyTrainer
   },
@@ -18,6 +13,11 @@ const routes = [
     path: "/fraction-trainer",
     name: "fraction-trainer",
     component: FractionTrainer
+  },
+  {
+    path: "/equation-trainer",
+    name: "equation-trainer",
+    component: EquationTrainer
   }
 ];
 
