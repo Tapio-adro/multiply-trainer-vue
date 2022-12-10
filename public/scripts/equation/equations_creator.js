@@ -11,9 +11,11 @@ function getLinearEquation () {
   // return [coefficient + '(x - ' + bracketsPart + ') - ' + leftNum + ' = 0', coefficient + 'x - ' + num + ' = 0']
   return {
     type: 'simple',
+    answer: x,
+    string: coefficient + '(x - ' + bracketsPart + ') = ' + leftNum,
     parts: [
       [coefficient + '(x - ' + bracketsPart + ') = ' + leftNum, ''],
-      [coefficient + '•x - ' + coefficient + '•' + bracketsPart + ' = ' + leftNum, 'Розкриємо дужки'],
+      [coefficient + '•x - ' + coefficient + '•' + bracketsPart + ' = ' + leftNum, 'Розкриваємо дужки'],
       [coefficient + 'x - ' + bracketsNum + ' = ' + leftNum, 'Виконаємо дії'],
       [coefficient + 'x = ' + leftNum + ' + ' + bracketsNum, 'Переносимо відомі вправо'],
       [coefficient + 'x = ' + num + ' | ÷' + coefficient, 'Ділимо обидві частини на ' + coefficient],
@@ -33,13 +35,20 @@ function getIncompleteQuadraticEquation () {
   let sq = '<sup>2</sup>'
   return {
     type: 'complex',
+    answer: [0, x],
+    string: coefficient + 'x(x - ' + bracketsPart + ') = ' + leftNum + 'x',
     parts: [
       [coefficient + 'x(x - ' + bracketsPart + ') = ' + leftNum + 'x', ''],
-      [coefficient + 'x•x - ' + coefficient + 'x•' + bracketsPart + ' = ' + leftNum + 'x', 'Розкриємо дужки'],
-      [coefficient + 'x' + sq + ' - ' + bracketsNum + 'x = ' + leftNum + 'x', 'Виконаємо дії'],
+      [coefficient + 'x•x - ' + coefficient + 'x•' + bracketsPart + ' = ' + leftNum + 'x', 'Розкриваємо дужки'],
+      [coefficient + 'x' + sq + ' - ' + bracketsNum + 'x = ' + leftNum + 'x', 'Виконуємо дії'],
       [coefficient + 'x' + sq + ' - ' + bracketsNum + 'x - ' + leftNum + 'x = 0', 'Переносимо невідомі вліво'],
-      [coefficient + 'x' + sq + ' - ' + num + 'x = 0', 'Ділимо обидві частини на ' + coefficient],
-      ['x = ' + x, '']
+      [coefficient + 'x' + sq + ' - ' + num + 'x = 0', 'Виконуємо дії'],
+      ['x' + sq + ' - ' + x + 'x = 0', 'Ділимо обидві частини на ' + coefficient],
+      ['<u>x</u>•x - <u>x</u>•' + x + ' = 0', 'Виділяємо спільні множники'],
+      ['x(x - ' + x + ') = 0', 'Вносимо в дужки'],
+      [['x = 0', 'x - ' + x + ' = 0'], ''],
+      [['x = 0', 'x = ' + x], ''],
+      ['В.: x = 0 і x = ' + x, ''],
     ]
   }
 }
