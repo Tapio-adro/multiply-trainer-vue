@@ -105,7 +105,7 @@ export default {
 			// save time, when training started
 			this.time.timeStart = new Date();
 			setTimeout(() => {
-				this.equations = createEquationsList(...this.inputValues);
+				this.equations = createFractionsList(...this.inputValues);
 				this.equations.forEach(eq => {
 					console.log(eq.answer);
 				});

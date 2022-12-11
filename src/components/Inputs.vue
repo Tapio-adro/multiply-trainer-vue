@@ -21,9 +21,8 @@
           v-for="(button, index) in buttonsRow.buttons" :key="index"
           :class="{active: button.isEnabled}"
           @click="toggleButton(rowIndex, index)"
-        >
-          {{ button.value }}
-        </button>
+          v-html="button.value"
+        ></button>
         <div 
           v-if="buttonsRow.toggleAllButton"
           class="toggle_all_button"
@@ -161,11 +160,16 @@ export default {
           subType: section.subType,
           toggleAllButton: section.toggleAllButton,
           isToggleAllButtonEnabled: false,
+          namedValues: section.namedValues,
           buttons: []
         }
         for (let value of section.values) {
           let isEnabled = section.areAllEnabled ? true : false;
-          buttonsRow.buttons.push({value, isEnabled});
+          if (section.namedValues) {
+            buttonsRow.buttons.push({value: value[1], key: value[0], isEnabled});
+          } else {
+            buttonsRow.buttons.push({value, isEnabled});
+          }
         }
         buttonsRow.buttons[0].isEnabled = true;
         this.buttonsRows.push(buttonsRow);
@@ -204,7 +208,11 @@ export default {
         let valuesArray = row.buttons.filter((button) => {
           return button.isEnabled;
         }).map((button) => {
-          return button.value;
+          if (row.namedValues) {
+            return button.key;
+          } else {
+            return button.value;
+          }
         })
         inputsData.push(valuesArray);
       }

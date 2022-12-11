@@ -1,5 +1,29 @@
-let types = ['linear', 'incomplete quadratic','quadratic']
+let equationTypes = {'linear': getLinearEquation, 'incomplete quadratic': getIncompleteQuadraticEquation,'quadratic': getQuadraticEquation};
 
+function createEquationsList (equationsTypes, amount) {
+  console.log(equationsTypes.length);
+  let index = 0;
+  let equations = [];
+  while (amount != 0) {
+    let equation = equationTypes[equationsTypes[index]]()
+    equations.push(equation);
+    index += 1;
+    if (index == equationsTypes.length) {
+      index = 0;
+    }
+    amount -= 1;
+  }
+  console.log(equations);
+  return equations;
+
+  function shuffle(arr) {
+		let result = [];
+		while (arr.length != 0) {
+			result.push(...arr.splice(random(arr), 1));
+		}
+		return result;
+	}
+}
 // linear
 function getLinearEquation () {
   let x = getRandom(2, 9);
@@ -10,7 +34,7 @@ function getLinearEquation () {
   let leftNum = num - bracketsNum;
   // return [coefficient + '(x - ' + bracketsPart + ') - ' + leftNum + ' = 0', coefficient + 'x - ' + num + ' = 0']
   return {
-    type: 'simple',
+    type: 'linear',
     answer: x,
     string: coefficient + '(x - ' + bracketsPart + ') = ' + leftNum,
     parts: [
@@ -34,7 +58,7 @@ function getIncompleteQuadraticEquation () {
 
   let sq = '<sup>2</sup>'
   return {
-    type: 'complex',
+    type: 'inquad',
     answer: [0, x],
     string: coefficient + 'x(x - ' + bracketsPart + ') = ' + leftNum + 'x',
     parts: [
@@ -52,10 +76,13 @@ function getIncompleteQuadraticEquation () {
     ]
   }
 }
-let result = getIncompleteQuadraticEquation();
-document.open();
-for (let elem of result.parts) {
-  document.writeln(elem[0] + '  ' + elem[1] + '<br>')
-  console.log();
+function getQuadraticEquation () {
+  
 }
-document.close();
+let result = getIncompleteQuadraticEquation;
+// document.open();
+// for (let elem of result.parts) {
+//   document.writeln(elem[0] + '  ' + elem[1] + '<br>')
+//   console.log();
+// }
+// document.close();

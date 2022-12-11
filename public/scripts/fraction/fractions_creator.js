@@ -1,8 +1,6 @@
-let equationTypes = ["full", "1st_part", "2nd_part"];
-
 let actionSigns = ["+", "-", "×", "÷"];
 
-function createEquationsList(actions, amount) {
+function createFractionsList(actions, amount) {
   actionSigns = actions.map((item) => {
     return item == '−' ? '-' : item;
   });
@@ -208,6 +206,7 @@ function simplifyEquation(equation) {
 }
 
 function createEquation() {
+  let equationTypes = ["full", "1st_part", "2nd_part"];
   let eqType = randomFromArray(equationTypes);
   let answer = getRandom(1, 10);
 
