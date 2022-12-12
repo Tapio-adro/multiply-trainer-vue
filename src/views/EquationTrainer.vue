@@ -12,11 +12,13 @@
 			<EquationArea
 				ref="equationArea"
 				v-model:answer="answer"
+				v-model:answer2="answer2"
 				v-model:equationText="equationText"
 				:trainingInProgress="trainingInProgress"
 				v-model:signLook="signLook"
 				:displayRawHTML="true"
 				:equationTrainer="true"
+				:twoAnswers="twoAnswers"
 				@signClicked="processEnterInput"
 			/>
 			<MistakesFT
@@ -66,13 +68,15 @@ export default {
 			curEquation: {},
 			equationText: '',
 			answer: 0,
+			answer2: null,
 			maxPoints: 0,
 			curPoints: 0,
 			mistakes: [],
 			results: {},
 			canRecieveEnterInput: true,
 			passInputs: false,
-			signLook: ''
+			signLook: '',
+			twoAnswers: false
 		}
 	},
 	watch: {
@@ -143,6 +147,7 @@ export default {
 		showNextEquation(hasMistaken) {
 			this.answer = null;
 			this.curEquation = this.equations.pop();
+			this.twoAnswers = typeof this.curEquation.answer == 'object'
 			let equationString = this.curEquation.string;
 			this.$refs.equationArea.changeEquationText(equationString, !hasMistaken);
 		},
@@ -300,8 +305,8 @@ export default {
 						name: 'operations', 
             namedValues: true,
 						values: [
-              ['linear', 'x + a = 0'],
-              ['incomplete quadratic', 'x<sup>2</sup> + x = 0']
+              ['incomplete quadratic', 'x<sup>2</sup> + x = 0'],
+              ['linear', 'x + a = 0']
             ], 
 						toggleAllButton: false,
 						areAllEnabled: false

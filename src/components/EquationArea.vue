@@ -5,8 +5,13 @@
     <div v-if="displayRawHTML" class="equation_text" :class="{fraction: !equationTrainer}" ref="equationText" v-html="equationText"></div>
     <div v-else class="equation_text" ref="equationText">{{ equationText }}</div>
     <div class="answer_area" :class="{change_height: signLook == 'submit'}">
-      <span v-if="equationTrainer" v-show="signLook == 'submit'"><span class="x">x</span> =</span>&nbsp;
+      <span v-if="equationTrainer" v-show="signLook == 'submit'" class="x_holder"><span class="x">x</span> =&nbsp;</span>
       <input type="number" class="answer_text hiden" ref="answerInput" v-model="answer" @input="checkInputValue">
+      <template v-if="twoAnswers">
+        &nbsp;
+        <span v-if="equationTrainer" v-show="signLook == 'submit'" class="x_holder"><span class="x">x</span> =&nbsp;</span>
+        <input type="number" class="answer_text" ref="answerInput2" v-model="answer2" @input="checkInputValue2">
+      </template>
       <button class="sign start" @click="this.$emit('signClicked')" ref="sign">
         <div id="sign_start"></div>
       </button>
@@ -34,9 +39,17 @@ export default {
     equationTrainer: {
       default: false,
       type: Boolean
+    },
+    twoAnswers: {
+      default: false,
+      type: Boolean
+    },
+    answer2: {
+      default: false,
+      type: [Number, String]
     }
   },
-  emits: ['update:answer', 'signClicked', 'update:equationText', 'update:signLook'],
+  emits: ['update:answer', 'update:answer2', 'signClicked', 'update:equationText', 'update:signLook'],
   watch: {
     trainingInProgress() {
       if (this.trainingInProgress) {
@@ -53,6 +66,9 @@ export default {
     },
     answer() {
       this.$emit('update:answer', this.answer);
+    },
+    answer2() {
+      this.$emit('update:answer2', this.answer2);
     }
   },
   methods: {
@@ -125,7 +141,13 @@ export default {
 		},
     checkInputValue(e) {
       if (Number(this.answer) > 99) {
-        let elem = e.target;
+        let elem = this.$refs.answerInput;
+        elem.value = String(elem.value).slice(0, 2);
+      }
+    },
+    checkInputValue2(e) {
+      if (Number(this.answer2) > 99) {
+        let elem = this.$refs.answerInput2;
         elem.value = String(elem.value).slice(0, 2);
       }
     }

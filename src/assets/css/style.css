@@ -300,6 +300,9 @@ body sup, body sub {
 #equation_area .answer_area.change_height {
   height: 40px;
 }
+#equation_area .answer_area .x_holder {
+  bottom: 3px;
+}
 #equation_area .answer_area .x {
   bottom: 3px;
 }
@@ -444,6 +447,7 @@ body sup, body sub {
   transition: 1s;
   display: block;
   margin-bottom: 30px;
+  margin-top: 15px;
 }
 #mistakes .explanation_wrapper .equation_wrapper {
   display: flex;
@@ -687,6 +691,13 @@ body sup, body sub {
     margin: 0 auto;
     padding: 15px 0;
   }
+  #inputs.autoButtonsWidth .buttons_row button {
+    height: 40px;
+    font-size: 15px;
+  }
+  #inputs.autoButtonsWidth .buttons_row button sup {
+    font-size: 10px;
+  }
   #inputs .buttons_row {
     margin-bottom: 5px;
   }
@@ -731,6 +742,9 @@ body sup, body sub {
     margin: 15px 0;
     height: 150px;
   }
+  #equation_area .inner.flex_column {
+    row-gap: 10px;
+  }
   #equation_area .equation_text {
     font-size: 30px;
     margin-right: 6px;
@@ -744,6 +758,15 @@ body sup, body sub {
     width: 40px;
     font-size: 20px;
     padding: 5px;
+  }
+  #equation_area .answer_area {
+    font-size: 30px;
+  }
+  #equation_area .answer_area.change_height {
+    height: 30px;
+  }
+  #equation_area .answer_area .x_holder {
+    bottom: 1px;
   }
   #equation_area .sign.start {
     border-radius: 7px;
@@ -770,9 +793,9 @@ body sup, body sub {
   }
   #mistakes .mistakes_header {
     font-size: 30px;
-    margin: 0 0 15px;
+    margin: 0 0 8px;
   }
-  #mistakes .mistake_cross {
+  #mistakes .mistakes_header .mistake_cross {
     height: 25px;
     width: 25px;
     margin-right: 7px;
