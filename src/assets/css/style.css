@@ -223,6 +223,10 @@ body sup, body sub {
   width: 100%;
   height: 100%;
 }
+#equation_area .inner.flex_column {
+  flex-direction: column;
+  row-gap: 20px;
+}
 #equation_area .inner.hiden {
   opacity: 0;
   transition: 0.25s;
@@ -288,6 +292,16 @@ body sup, body sub {
 }
 #equation_area .checkmark.none {
   display: none;
+}
+#equation_area .answer_area {
+  font-size: 40px;
+  display: flex;
+}
+#equation_area .answer_area.change_height {
+  height: 40px;
+}
+#equation_area .answer_area .x {
+  bottom: 3px;
 }
 
 #equation_area .sign {

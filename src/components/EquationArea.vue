@@ -1,13 +1,16 @@
 <template>
 
 <div id="equation_area" ref="area">
-  <div ref="inner" class="inner">
-    <div v-if="displayRawHTML" class="equation_text fraction" ref="equationText" v-html="equationText"></div>
+  <div ref="inner" class="inner" :class="{flex_column: equationTrainer && signLook == 'submit'}">
+    <div v-if="displayRawHTML" class="equation_text" :class="{fraction: !equationTrainer}" ref="equationText" v-html="equationText"></div>
     <div v-else class="equation_text" ref="equationText">{{ equationText }}</div>
-    <input type="number" class="answer_text hiden" ref="answerInput" v-model="answer" @input="checkInputValue">
-    <button class="sign start" @click="this.$emit('signClicked')" ref="sign">
-      <div id="sign_start"></div>
-    </button>
+    <div class="answer_area" :class="{change_height: signLook == 'submit'}">
+      <span v-if="equationTrainer" v-show="signLook == 'submit'"><span class="x">x</span> =</span>&nbsp;
+      <input type="number" class="answer_text hiden" ref="answerInput" v-model="answer" @input="checkInputValue">
+      <button class="sign start" @click="this.$emit('signClicked')" ref="sign">
+        <div id="sign_start"></div>
+      </button>
+    </div>
   </div>
   <div class="checkmark hiden none" ref="checkmark">
     <i class="fa fa-check" aria-hidden="true"></i>
@@ -25,6 +28,10 @@ export default {
     trainingInProgress: Boolean,
     signLook: String,
     displayRawHTML: {
+      default: false,
+      type: Boolean
+    },
+    equationTrainer: {
       default: false,
       type: Boolean
     }

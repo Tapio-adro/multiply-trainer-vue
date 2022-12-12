@@ -16,6 +16,7 @@
 				:trainingInProgress="trainingInProgress"
 				v-model:signLook="signLook"
 				:displayRawHTML="true"
+				:equationTrainer="true"
 				@signClicked="processEnterInput"
 			/>
 			<MistakesFT
@@ -94,7 +95,7 @@ export default {
 				that.$refs.toTopButton.$el.classList.add('hiden');
 			}
 		}
-		// processEnterInput();
+		this.processEnterInput();
 	},
 	methods: {
 		start() {
@@ -107,15 +108,15 @@ export default {
 			this.time.timeStart = new Date();
 			setTimeout(() => {
 				this.equations = createEquationsList(...this.inputValues);
-			// 	this.equations.forEach(eq => {
-			// 		console.log(eq.answer);
-			// 	});
+				this.equations.forEach(eq => {
+					console.log(eq.answer);
+				});
 
-			// 	this.equationsAmount = this.equations.length;
+				this.equationsAmount = this.equations.length;
 		
-			// 	this.maxPoints = this.equations.length;
+				this.maxPoints = this.equations.length;
 	
-			// 	this.showNextEquation(true);
+				this.showNextEquation(true);
 			}, 0)
 		},
 		processEnterInput() {
@@ -142,7 +143,7 @@ export default {
 		showNextEquation(hasMistaken) {
 			this.answer = null;
 			this.curEquation = this.equations.pop();
-			let equationString = this.curEquation.partial;
+			let equationString = this.curEquation.string;
 			this.$refs.equationArea.changeEquationText(equationString, !hasMistaken);
 		},
 		checkAnswer() {

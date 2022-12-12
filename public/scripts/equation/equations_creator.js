@@ -14,7 +14,7 @@ function createEquationsList (equationsTypes, amount) {
     amount -= 1;
   }
   console.log(equations);
-  return equations;
+  return shuffle(equations);
 
   function shuffle(arr) {
 		let result = [];
@@ -22,6 +22,9 @@ function createEquationsList (equationsTypes, amount) {
 			result.push(...arr.splice(random(arr), 1));
 		}
 		return result;
+    function random(arr) {
+      return Math.floor(Math.random() * arr.length);
+    }
 	}
 }
 // linear
