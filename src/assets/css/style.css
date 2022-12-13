@@ -281,7 +281,6 @@ body sup, body sub {
   font-weight: bold;
   font-size: 45px;
   color: var(--green);
-  border: none;
   display: flex;
   justify-content: center;
   align-items: center;

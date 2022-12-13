@@ -67,7 +67,7 @@ export default {
 			equations: [],
 			curEquation: {},
 			equationText: '',
-			answer: 0,
+			answer: null,
 			answer2: null,
 			maxPoints: 0,
 			curPoints: 0,
@@ -99,7 +99,7 @@ export default {
 				that.$refs.toTopButton.$el.classList.add('hiden');
 			}
 		}
-		this.processEnterInput();
+		// this.processEnterInput();
 	},
 	methods: {
 		start() {
@@ -114,6 +114,7 @@ export default {
 				this.equations = createEquationsList(...this.inputValues);
 				this.equations.forEach(eq => {
 					console.log(eq.answer);
+					console.log(typeof eq.answer);
 				});
 
 				this.equationsAmount = this.equations.length;
@@ -146,8 +147,12 @@ export default {
 		},
 		showNextEquation(hasMistaken) {
 			this.answer = null;
+			this.answer2 = null;
 			this.curEquation = this.equations.pop();
-			this.twoAnswers = typeof this.curEquation.answer == 'object'
+			let timeoutTime = hasMistaken ? 0 : 500;
+			setTimeout(() => {
+				this.twoAnswers = typeof this.curEquation.answer == 'object'
+			}, timeoutTime)
 			let equationString = this.curEquation.string;
 			this.$refs.equationArea.changeEquationText(equationString, !hasMistaken);
 		},
@@ -156,13 +161,19 @@ export default {
 
 			let mistake = false;
 			let answer = this.answer;
+			let answer2 = this.answer2;
 			let equation = this.curEquation;
+			let that = this;
 
-			if (!answer) {
-				this.$refs.equationArea.$refs.answerInput.focus();
+			if (checkNoAnswers()) {
+				if (answer === null) {
+					this.$refs.equationArea.$refs.answerInput.focus();
+				} else {
+					this.$refs.equationArea.$refs.answerInput2.focus();
+				}
 				return;
 			} else {
-				if (answer == equation.answer) {
+				if (compareAnswers()) {
 					this.curPoints++;
 					this.$refs.mistakes.deactivateMistakesHeader();
 					this.$refs.equationArea.$refs.answerInput.focus();
@@ -188,6 +199,19 @@ export default {
 					this.signLook = 'accept';					
 					this.equationText = '';
 					this.trainingInProgress = false;
+				}
+			}
+
+			function checkNoAnswers () {
+				return that.twoAnswers ? answer === null || answer2 === null : answer === null;
+			}
+			function compareAnswers() {
+				let answer = that.curEquation.answer
+				if (typeof answer == 'number') {
+					return answer == that.answer;
+				} else {
+					return (answer[0] == that.answer && answer[1] == that.answer2)
+							|| (answer[0] == that.answer2 && answer[1] == that.answer);
 				}
 			}
 

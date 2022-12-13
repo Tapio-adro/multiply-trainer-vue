@@ -7,7 +7,7 @@
     <div class="answer_area" :class="{change_height: signLook == 'submit'}">
       <span v-if="equationTrainer" v-show="signLook == 'submit'" class="x_holder"><span class="x">x</span> =&nbsp;</span>
       <input type="number" class="answer_text hiden" ref="answerInput" v-model="answer" @input="checkInputValue">
-      <template v-if="twoAnswers">
+      <template v-if="twoAnswers && signLook == 'submit'">
         &nbsp;
         <span v-if="equationTrainer" v-show="signLook == 'submit'" class="x_holder"><span class="x">x</span> =&nbsp;</span>
         <input type="number" class="answer_text" ref="answerInput2" v-model="answer2" @input="checkInputValue2">
