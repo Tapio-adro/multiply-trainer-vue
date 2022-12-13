@@ -1,17 +1,13 @@
 let equationTypes = {'linear': getLinearEquation, 'incomplete quadratic': getIncompleteQuadraticEquation,'quadratic': getQuadraticEquation};
 
 function createEquationsList (equationsTypes, amount) {
-  console.log(equationsTypes.length);
-  let index = 0;
+  amount *= 4;
   let equations = [];
-  while (amount != 0) {
-    let equation = equationTypes[equationsTypes[index]]()
-    equations.push(equation);
-    index += 1;
-    if (index == equationsTypes.length) {
-      index = 0;
+  for (let type of equationsTypes) {
+    for (let j = 1; j <= amount; j++) {
+      let equation = equationTypes[type]()
+      equations.push(equation);
     }
-    amount -= 1;
   }
   console.log(equations);
   return shuffle(equations);

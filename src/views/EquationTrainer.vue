@@ -336,8 +336,9 @@ export default {
 						areAllEnabled: false
 					}
 				],
-				isCoefficientBased: false,
-				rangeValues: {min: 3, max: 12, step: 3, value: 3}
+				isCoefficientBased: true,
+				rangeValues: [0.25, 0.5, 1, 2, 4],
+				coefficientValue: 4
 			}
 		},
 		getInputsData(inputsData) {
