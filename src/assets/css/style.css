@@ -483,6 +483,30 @@ body sup, body sub {
   flex-wrap: wrap;
 }
 
+#mistakes .explanation_wrapper .equation {
+  padding-left: 30px;
+  font-size: 1.5rem;
+  display: grid;
+  grid-template-columns: minmax(100px, 150px) minmax(150px, auto);
+  justify-items: start;
+}
+#mistakes .explanation_wrapper .equation div {
+  margin-bottom: 10px;
+}
+#mistakes .explanation_wrapper .equation .last {
+  text-decoration: underline;
+  -webkit-text-decoration-color: #666666;
+          text-decoration-color: #666666;
+  margin-bottom: 0;
+}
+#mistakes .explanation_wrapper .left {
+  padding-right: 10px;
+}
+#mistakes .explanation_wrapper .right {
+  border-left: 4px solid var(--green);
+  padding-left: 5px;
+}
+
 #results {
   z-index: 3;
   position: fixed;

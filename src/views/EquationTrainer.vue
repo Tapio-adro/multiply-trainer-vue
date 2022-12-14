@@ -21,9 +21,11 @@
 				:twoAnswers="twoAnswers"
 				@signClicked="processEnterInput"
 			/>
-			<MistakesFT
+			<MistakesET
 				ref="mistakes"
 				:mistakes="mistakes"
+				:mistakesData="mistakesData"
+				@focus-to-top-button="$refs.toTopButton.focus();"
 			/>		
 			<ToTopButton
 				ref="toTopButton"
@@ -41,7 +43,7 @@
 <script>
 import Inputs from '../components/Inputs.vue'
 import EquationArea from '../components/EquationArea.vue'
-import MistakesFT from '../components/MistakesFT.vue'
+import MistakesET from '../components/MistakesET.vue'
 import ToTopButton from '../components/ToTopButton.vue'
 import Results from '../components/Results.vue'
 
@@ -50,7 +52,7 @@ export default {
 	components: {
 		Inputs,
 		EquationArea,
-		MistakesFT,
+		MistakesET,
 		ToTopButton,
 		Results
 	},
@@ -76,7 +78,8 @@ export default {
 			canRecieveEnterInput: true,
 			passInputs: false,
 			signLook: '',
-			twoAnswers: false
+			twoAnswers: false,
+			mistakesData: []
 		}
 	},
 	watch: {
@@ -99,7 +102,7 @@ export default {
 				that.$refs.toTopButton.$el.classList.add('hiden');
 			}
 		}
-		// this.processEnterInput();
+		this.processEnterInput();
 	},
 	methods: {
 		start() {
@@ -217,36 +220,9 @@ export default {
 
 		},
 		showExplanations () {
-			let explanationsWrapper = document.createElement('div');
-			let fullEquationContainer = document.createElement('div');
-			let explanationsContainer = document.createElement('div');
-			explanationsWrapper.className = 'explanation_wrapper';
-			fullEquationContainer.className = 'equation_wrapper';
-			explanationsContainer.className = 'explanation_container';
-			explanationsWrapper.appendChild(fullEquationContainer);
-			explanationsWrapper.appendChild(explanationsContainer);
+			this.mistakesData.unshift(this.curEquation.parts)
 
-			let equationDiv = document.createElement('div');
-			equationDiv.className = 'equation_with_answer';
-			equationDiv.innerHTML = this.curEquation.full;
-
-			fullEquationContainer.appendChild(equationDiv);
-
-			explanationsContainer.innerHTML = this.curEquation.explanations;
-			
-			this.$refs.mistakes.$refs.explanations_container.prepend(explanationsWrapper);
-
-			// if (equations.length == 0) {
-			// 	toTopButton.innerHTML = '✓';
-			// }
 			this.$refs.mistakes.mistakeAdded();
-			let that = this;
-			setTimeout(() => {
-				explanationsWrapper.scrollIntoView({behavior: "smooth"});
-				setTimeout(() => {
-					that.$refs.toTopButton.focus();
-				}, 500)
-			}, 500)
 		},
 		checkNoMistakes() {
 			if (this.curPoints == this.maxPoints) {
@@ -329,8 +305,8 @@ export default {
 						name: 'operations', 
             namedValues: true,
 						values: [
-              ['incomplete quadratic', 'x<sup>2</sup> + x = 0'],
-              ['linear', 'x + a = 0']
+              ['linear', 'x + a = 0'],
+              ['incomplete quadratic', 'x<sup>2</sup> + x = 0']
             ], 
 						toggleAllButton: false,
 						areAllEnabled: false
