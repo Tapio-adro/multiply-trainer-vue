@@ -41,7 +41,7 @@ function getLinearEquation () {
       [coefficient + '•x - ' + coefficient + '•' + bracketsPart + ' = ' + leftNum, 'Розкриваємо дужки'],
       [coefficient + 'x - ' + bracketsNum + ' = ' + leftNum, 'Виконаємо дії'],
       [coefficient + 'x = ' + leftNum + ' + ' + bracketsNum, 'Переносимо відомі вправо'],
-      [coefficient + 'x = ' + num + ' | ÷' + coefficient, 'Ділимо обидві частини на ' + coefficient],
+      [coefficient + 'x = ' + num + ' | ÷' + coefficient, 'Виконаємо дії і ділимо обидві частини на ' + coefficient],
       ['x = ' + x, '']
     ]
   }
@@ -69,9 +69,8 @@ function getIncompleteQuadraticEquation () {
       ['x' + sq + ' - ' + x + 'x = 0', 'Ділимо обидві частини на ' + coefficient],
       ['<u>x</u>•x - <u>x</u>•' + x + ' = 0', 'Виділяємо спільні множники'],
       ['x(x - ' + x + ') = 0', 'Вносимо в дужки'],
-      [['x = 0', 'x - ' + x + ' = 0'], ''],
-      [['x = 0', 'x = ' + x], ''],
-      ['В.: x = 0 і x = ' + x, ''],
+      [['x = 0', 'x - ' + x + ' = 0'], ['x = 0', 'x = ' + x], 'Знаходимо корені'],
+      ['x = 0, x = ' + x, 'Записуємо відповіді']
     ]
   }
 }

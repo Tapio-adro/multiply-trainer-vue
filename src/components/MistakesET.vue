@@ -3,8 +3,7 @@
 		<div class="mistakes_header" ref="mistakesHeader">
 			<div class="mistake_cross"></div>
 		</div>
-		<div ref="explanations_container">
-			<div></div>
+		<div v-if="mistakesData.length != 0" ref="explanations_container">
 			<div v-for="(equation, index) in mistakesData" :key="index" class="explanation_wrapper">
 				<div class="equation_wrapper">
 					<div class="equation_with_answer" v-html="equation[0][0]" :ref="index == 0 ? 'last_mistake' : 'no_ref'"></div>
@@ -12,10 +11,27 @@
 				<div class="explanation_container equation">
 					<template v-for="(part, index) in equation" :key="index">
 						<template v-if="typeof part[0] == 'string'">
-							<div class="left" :class="{last: index == equation.length - 1}">
-								{{ part[0] }}
+							<div class="left elem" :class="{underline: index == equation.length - 1}" v-html="part[0]"></div>
+							<div class="elem" :class="{right: part[1] != '', last: index == equation.length - 1}" v-html="part[1]"></div>
+						</template>
+						<template v-else>
+							<div class="ors_holder">
+								<div class="or_wrapper">
+									<div class="or_figure"></div>
+									<div class="or_holder">
+										<div v-html="part[0][0]"></div>
+										<div v-html="part[0][1]"></div>
+									</div>
+								</div>
+								<div class="or_wrapper">
+									<div class="or_figure"></div>
+									<div class="or_holder">
+										<div v-html="part[1][0]"></div>
+										<div v-html="part[1][1]"></div>
+									</div>
+								</div>
 							</div>
-							<div :class="{right: part[1] != '', last: index == equation.length - 1}">{{ part[1] }}</div>
+							<div class="elem right" v-html="part[2]"></div>
 						</template>
 					</template>
 				</div>
@@ -30,16 +46,10 @@ export default {
   props: {
 		mistakesData: Array
 	},
-  data() {
-    return {
-			mistakes: 0
-    }
-  },
 	emits: ['focusToTopButton'],
   methods: {
     mistakeAdded() {
-			this.mistakes += 1;
-			let mistakesAmount = this.mistakes;
+			let mistakesAmount = this.mistakesData.length;
 			if (mistakesAmount == 1) {
 				this.$refs.mistakesHeader.classList.add('active');
 			} else {

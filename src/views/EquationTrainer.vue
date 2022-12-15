@@ -1,6 +1,7 @@
 <template>
   <div class="main">
 		<div class="wrapper">
+			<div class="box"></div>
 			<Inputs 
 				:inputs-options="getInputsOptions()"
 				:pass-inputs="passInputs"
@@ -23,7 +24,6 @@
 			/>
 			<MistakesET
 				ref="mistakes"
-				:mistakes="mistakes"
 				:mistakesData="mistakesData"
 				@focus-to-top-button="$refs.toTopButton.focus();"
 			/>		
@@ -73,7 +73,6 @@ export default {
 			answer2: null,
 			maxPoints: 0,
 			curPoints: 0,
-			mistakes: [],
 			results: {},
 			canRecieveEnterInput: true,
 			passInputs: false,
@@ -102,7 +101,7 @@ export default {
 				that.$refs.toTopButton.$el.classList.add('hiden');
 			}
 		}
-		this.processEnterInput();
+		// this.processEnterInput();
 	},
 	methods: {
 		start() {
@@ -117,7 +116,6 @@ export default {
 				this.equations = createEquationsList(...this.inputValues);
 				this.equations.forEach(eq => {
 					console.log(eq.answer);
-					console.log(typeof eq.answer);
 				});
 
 				this.equationsAmount = this.equations.length;
@@ -295,7 +293,8 @@ export default {
 			this.curPoints = 0;
 			this.passInputs = false;
 			this.$refs.results.$refs.progressLine.style.width = '0%';
-			this.mistakes = [];
+			this.mistakesData = [];
+			this.twoAnswers = false;
 		},
 		getInputsOptions () {
 			return {
@@ -305,8 +304,8 @@ export default {
 						name: 'operations', 
             namedValues: true,
 						values: [
+              ['incomplete quadratic', 'x<sup>2</sup> + x = 0'],
               ['linear', 'x + a = 0'],
-              ['incomplete quadratic', 'x<sup>2</sup> + x = 0']
             ], 
 						toggleAllButton: false,
 						areAllEnabled: false
