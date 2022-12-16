@@ -101,7 +101,14 @@ export default {
 				that.$refs.toTopButton.$el.classList.add('hiden');
 			}
 		}
-		// this.processEnterInput();
+		this.processEnterInput();
+		setTimeout(() => {
+			this.answer = 2;
+			this.answer2 = 2;
+			setTimeout(() => {
+				this.processEnterInput();
+			}, 10)
+		}, 10)
 	},
 	methods: {
 		start() {
@@ -304,6 +311,7 @@ export default {
 						name: 'operations', 
             namedValues: true,
 						values: [
+              ['quadratic', 'x<sup>2</sup> + x + c = 0'],
               ['incomplete quadratic', 'x<sup>2</sup> + x = 0'],
               ['linear', 'x + a = 0'],
             ], 

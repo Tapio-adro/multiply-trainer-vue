@@ -39,6 +39,10 @@ body sup, body sub {
   font-size: 0.8rem;
 }
 
+.sqrt {
+  border-top: 1px solid #000;
+}
+
 .main {
   margin: auto;
   max-width: 1000px;
@@ -246,6 +250,9 @@ body sup, body sub {
   margin-right: 10px;
   color: #262626;
   transition: 0.5s;
+}
+#equation_area .equation_text sup {
+  font-size: 1.2rem;
 }
 #equation_area .equation_text.fraction {
   font-size: 35px;
@@ -483,7 +490,14 @@ body sup, body sub {
   flex-wrap: wrap;
 }
 
-#mistakes .explanation_wrapper .equation {
+#mistakes .explanation_wrapper.equation sup {
+  font-size: 1rem;
+  bottom: 5px;
+}
+#mistakes .explanation_wrapper.equation sub {
+  top: 7px;
+}
+#mistakes .explanation_wrapper.equation .equation {
   padding-left: 30px;
   font-size: 1.5rem;
   display: grid;
@@ -491,35 +505,35 @@ body sup, body sub {
   grid-template-columns: max-content auto;
   justify-items: start;
 }
-#mistakes .explanation_wrapper .equation .elem {
+#mistakes .explanation_wrapper.equation .equation .elem {
   margin-bottom: 10px;
   display: flex;
   align-items: center;
 }
-#mistakes .explanation_wrapper .equation .underline {
+#mistakes .explanation_wrapper.equation .equation .underline {
   text-decoration: underline;
   -webkit-text-decoration-color: #666666;
           text-decoration-color: #666666;
   margin-bottom: 0;
 }
-#mistakes .explanation_wrapper .equation .last {
+#mistakes .explanation_wrapper.equation .equation .last {
   margin-bottom: 0;
 }
-#mistakes .explanation_wrapper .equation .top_border {
+#mistakes .explanation_wrapper.equation .equation .top_border {
   border-left: 4px solid var(--green);
   padding: 0 7px;
   margin-bottom: 0;
   display: flex;
   align-items: center;
 }
-#mistakes .explanation_wrapper .equation .left {
+#mistakes .explanation_wrapper.equation .equation .left {
   padding-right: 10px;
 }
-#mistakes .explanation_wrapper .equation .right {
+#mistakes .explanation_wrapper.equation .equation .right {
   border-left: 4px solid var(--green);
   padding-left: 5px;
 }
-#mistakes .explanation_wrapper .ors_holder {
+#mistakes .explanation_wrapper.equation .ors_holder {
   display: flex;
   padding: 7px;
   border-radius: 5px;
@@ -527,19 +541,23 @@ body sup, body sub {
        column-gap: 40px;
   margin-right: 10px;
 }
-#mistakes .explanation_wrapper .ors_holder .or_wrapper {
+#mistakes .explanation_wrapper.equation .ors_holder .or_wrapper {
   display: flex;
-  height: 70px;
+  min-height: 70px;
 }
-#mistakes .explanation_wrapper .ors_holder .or_figure {
+#mistakes .explanation_wrapper.equation .ors_holder .or_figure {
   border: 3px solid #000;
   border-right-width: 0;
   width: 10px;
 }
-#mistakes .explanation_wrapper .ors_holder .or_holder {
+#mistakes .explanation_wrapper.equation .ors_holder .or_holder {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
+}
+#mistakes .explanation_wrapper.equation .ors_holder .or_holder div {
+  display: flex;
+  align-items: center;
 }
 
 #results {
@@ -820,6 +838,9 @@ body sup, body sub {
     font-size: 30px;
     margin-right: 6px;
   }
+  #equation_area .equation_text sup {
+    font-size: 1rem;
+  }
   #equation_area .equation_text.fraction {
     font-size: 15px;
     max-width: 220px;
@@ -939,6 +960,80 @@ body sup, body sub {
     font-size: 15px;
     margin-bottom: 15px;
     width: 100%;
+  }
+  #mistakes .explanation_wrapper.equation .equation_with_answer {
+    font-size: 30px;
+  }
+  #mistakes .explanation_wrapper.equation .equation_with_answer sup {
+    font-size: 1rem;
+    bottom: 5px;
+  }
+  #mistakes .explanation_wrapper sup {
+    font-size: 0.8rem;
+    bottom: 5px;
+  }
+  #mistakes .explanation_wrapper .equation {
+    padding-left: 15px;
+    font-size: 0.8rem;
+    display: grid;
+    grid-template-columns: -webkit-max-content auto;
+    grid-template-columns: max-content auto;
+    justify-items: start;
+  }
+  #mistakes .explanation_wrapper .equation .elem {
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+  }
+  #mistakes .explanation_wrapper .equation .underline {
+    text-decoration: underline;
+    -webkit-text-decoration-color: #666666;
+            text-decoration-color: #666666;
+    margin-bottom: 0;
+  }
+  #mistakes .explanation_wrapper .equation .last {
+    margin-bottom: 0;
+  }
+  #mistakes .explanation_wrapper .equation .top_border {
+    border-left: 4px solid var(--green);
+    padding: 0 7px;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+  }
+  #mistakes .explanation_wrapper .equation .left {
+    padding-right: 10px;
+  }
+  #mistakes .explanation_wrapper .equation .right {
+    border-left: 4px solid var(--green);
+    padding-left: 5px;
+  }
+  #mistakes .explanation_wrapper .ors_holder {
+    zoom: 0.8;
+    display: flex;
+    padding: 7px;
+    border-radius: 5px;
+    -moz-column-gap: 20px;
+         column-gap: 20px;
+    margin-right: 10px;
+  }
+  #mistakes .explanation_wrapper .ors_holder .or_wrapper {
+    display: flex;
+    min-height: 60px;
+  }
+  #mistakes .explanation_wrapper .ors_holder .or_figure {
+    border: 1px solid #000;
+    border-right-width: 0;
+    width: 6px;
+  }
+  #mistakes .explanation_wrapper .ors_holder .or_holder {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+  }
+  #mistakes .explanation_wrapper .ors_holder .or_holder div {
+    display: flex;
+    align-items: center;
   }
   #results.full {
     top: 10%;

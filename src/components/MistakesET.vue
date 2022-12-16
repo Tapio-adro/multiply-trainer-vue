@@ -4,7 +4,7 @@
 			<div class="mistake_cross"></div>
 		</div>
 		<div v-if="mistakesData.length != 0" ref="explanations_container">
-			<div v-for="(equation, index) in mistakesData" :key="index" class="explanation_wrapper">
+			<div v-for="(equation, index) in mistakesData" :key="index" class="explanation_wrapper equation">
 				<div class="equation_wrapper">
 					<div class="equation_with_answer" v-html="equation[0][0]" :ref="index == 0 ? 'last_mistake' : 'no_ref'"></div>
 				</div>
