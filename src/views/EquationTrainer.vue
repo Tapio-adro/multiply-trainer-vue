@@ -101,14 +101,14 @@ export default {
 				that.$refs.toTopButton.$el.classList.add('hiden');
 			}
 		}
-		this.processEnterInput();
-		setTimeout(() => {
-			this.answer = 2;
-			this.answer2 = 2;
-			setTimeout(() => {
-				this.processEnterInput();
-			}, 10)
-		}, 10)
+		// this.processEnterInput();
+		// setTimeout(() => {
+		// 	this.answer = 2;
+		// 	this.answer2 = 2;
+		// 	setTimeout(() => {
+		// 		this.processEnterInput();
+		// 	}, 10)
+		// }, 10)
 	},
 	methods: {
 		start() {
@@ -295,7 +295,6 @@ export default {
 			this.equationText = '';
 			this.$refs.mistakes.$refs.mistakesHeader.innerHTML = '<div class="mistake_cross"></div>';	
 			this.$refs.mistakes.$refs.mistakesHeader.classList.remove('no_mistakes');
-			this.$refs.mistakes.$refs.explanations_container.innerHTML = '';
 			this.maxPoints = 0;
 			this.curPoints = 0;
 			this.passInputs = false;
@@ -311,9 +310,9 @@ export default {
 						name: 'operations', 
             namedValues: true,
 						values: [
-              ['quadratic', 'x<sup>2</sup> + x + c = 0'],
-              ['incomplete quadratic', 'x<sup>2</sup> + x = 0'],
               ['linear', 'x + a = 0'],
+              ['incomplete quadratic', 'x<sup>2</sup> + x = 0'],
+              ['quadratic', 'x<sup>2</sup> + x + c = 0']
             ], 
 						toggleAllButton: false,
 						areAllEnabled: false

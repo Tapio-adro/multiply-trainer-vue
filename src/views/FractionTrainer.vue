@@ -289,6 +289,7 @@ export default {
 			this.passInputs = false;
 			this.$refs.results.$refs.progressLine.style.width = '0%';
 			this.mistakes = [];
+			this.$refs.mistakes.mistakes = 0;
 		},
 		getInputsOptions () {
 			return {

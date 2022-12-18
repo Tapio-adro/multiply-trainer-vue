@@ -45,7 +45,7 @@ export default {
       type: Boolean
     },
     answer2: {
-      default: false,
+      default: 0,
       type: [Number, String]
     }
   },
@@ -83,7 +83,7 @@ export default {
 				case 'submit':
 					sign.setAttribute('class', 'sign');
 					sign.classList.add(type);
-					sign.innerHTML = '⇨';
+					sign.innerHTML = '&#8680;';
 					break;
 				case 'hiden':
 					sign.setAttribute('class', 'sign');
@@ -93,12 +93,12 @@ export default {
 				case 'reload':
 					sign.setAttribute('class', 'sign');
 					sign.classList.add(type);
-					sign.innerHTML = '↻';
+					sign.innerHTML = '&#8635;';
 					break;
         case 'accept':
 					sign.setAttribute('class', 'sign');
 					sign.classList.add(type);
-					sign.innerHTML = '✓';
+					sign.innerHTML = '&#2713;';
 					break;
         case 'checkmark':
 					sign.setAttribute('class', 'sign');

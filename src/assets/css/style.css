@@ -786,6 +786,7 @@ body sup, body sub {
     height: 35px;
     border-radius: 7px;
     margin: 2.5px 2.5px;
+    margin-bottom: 5px;
     border-style: solid;
     border-right-width: 0;
     border-left-width: 0;
@@ -809,6 +810,19 @@ body sup, body sub {
     grid-template-rows: 1fr 1fr;
     grid-gap: 6px;
     padding: 6px;
+    border-style: solid;
+    border-right-width: 0;
+    border-left-width: 0;
+    border-bottom-width: 3px;
+    border-top-width: 0;
+  }
+  #inputs .buttons_row .toggle_all_button:active {
+    border-bottom-width: 0;
+    border-top-width: 3px;
+    transition: 0s;
+  }
+  #inputs .buttons_row .toggle_all_button:hover {
+    opacity: 0.8;
   }
   #inputs .slider {
     height: 20px;
