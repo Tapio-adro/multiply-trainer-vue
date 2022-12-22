@@ -3,9 +3,11 @@
   --lightgray:#f2f2f2
   --gray:#d9d9d9
   --red:#ff6666
+$green: #04AA6D
+$lightgrey: #f3f3f3
+$grey: #ddd
 
 body
-  padding-top: 30px
   &::-webkit-scrollbar
     border-radius: 10px
     width: 10px
@@ -49,6 +51,34 @@ body
     flex-direction: column
     margin: 0 auto
     padding: 30px 0
+
+#nav
+  min-width: 400px
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2)  
+  background-color: $lightgrey
+  display: flex
+  justify-content: center
+  font-family: Verdana,sans-serif
+  z-index: 1
+  margin-bottom: 20px
+  @media (max-width: 600px)
+    min-width: 300px
+    margin-bottom: 0px
+  .link
+    font-size: 1rem
+    padding: 10px
+    background-color: $grey
+    cursor: pointer
+    margin: 0 20px
+    text-decoration: none
+    color: #000
+    text-align: center
+    @media (max-width: 600px)
+      font-size: 0.8rem
+      padding: 5px
+    &:hover, &.active
+      background-color: $green
+      color: #fff
 
 @mixin button($border-width)
   border-style: solid
@@ -574,7 +604,6 @@ body
 
 @media (max-width: 600px)
   body
-    padding-top: 40px
     background-color: var(--lightgray)
     
     .eqPart 

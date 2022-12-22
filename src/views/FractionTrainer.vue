@@ -303,7 +303,7 @@ export default {
 					}
 				],
 				isCoefficientBased: false,
-				rangeValues: {min: 3, max: 12, step: 3, value: 3}
+				rangeValues: {min: 3, max: 12, step: 3, value: 6}
 			}
 		},
 		getInputsData(inputsData) {

@@ -6,7 +6,7 @@ import EquationTrainer from "../views/EquationTrainer.vue";
 const routes = [
   {
     path: "/",
-    name: "multiply-trainer",
+    name: "",
     component: MultiplyTrainer
   },
   {

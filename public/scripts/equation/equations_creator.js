@@ -86,7 +86,7 @@ function getQuadraticEquation () {
   return {
     type: 'quad',
     answer: [x1, x2],
-    string: sqx + ' ' + showX(bx) + ' ' + showNum(cLeft) + ' = ' + showNum(cRight, true),
+    string: sqx + showX(bx) + ' ' + showNum(cLeft) + ' = ' + showNum(cRight, true),
     parts: [
       // ['x1 = ' + x1 + ' x2 = ' + x2, ''],
       // ['(x ' + op1 + ' ' + x1Abs + ')(x ' + op2 + ' ' + x2Abs + ') = 0', ''],

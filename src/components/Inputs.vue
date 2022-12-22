@@ -187,8 +187,8 @@ export default {
           min: 0,
           max: rangeValues.length - 1,
           step: 1,
-          value: 0
-          // value: Math.round(rangeValues.length / 2) - 1
+          // value: 0
+          value: Math.round(rangeValues.length / 2) - 1
         }    
       }
       this.refreshEquationsAmount();

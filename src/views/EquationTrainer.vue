@@ -235,6 +235,8 @@ export default {
 			}
 		},
 		hideElementsAndShowResults() {
+			document.activeElement.blur();
+
 			this.equationText = this.curPoints + ' / ' + this.maxPoints;
 			this.trainingInProgress = false;
 
