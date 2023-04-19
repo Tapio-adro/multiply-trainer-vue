@@ -98,7 +98,7 @@ export default {
         case 'accept':
 					sign.setAttribute('class', 'sign');
 					sign.classList.add(type);
-					sign.innerHTML = '&#2713;';
+					sign.innerHTML = '&#10003;';
 					break;
         case 'checkmark':
 					sign.setAttribute('class', 'sign');

@@ -107,7 +107,7 @@ export default {
 			setTimeout(() => {
 				this.equations = createFractionsList(...this.inputValues);
 				this.equations.forEach(eq => {
-					console.log(eq.answer);
+					// console.log(eq.answer);
 				});
 
 				this.equationsAmount = this.equations.length;

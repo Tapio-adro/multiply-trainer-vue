@@ -9,7 +9,7 @@ function createEquationsList (equationsTypes, amount) {
       equations.push(equation);
     }
   }
-  console.log(equations);
+  // console.log(equations);
   return shuffle(equations);
 }
 // linear

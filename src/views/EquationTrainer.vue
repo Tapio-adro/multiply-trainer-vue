@@ -122,7 +122,7 @@ export default {
 			setTimeout(() => {
 				this.equations = createEquationsList(...this.inputValues);
 				this.equations.forEach(eq => {
-					console.log(eq.answer);
+					// console.log(eq.answer);
 				});
 
 				this.equationsAmount = this.equations.length;

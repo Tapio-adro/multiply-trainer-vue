@@ -193,9 +193,9 @@ Fraction.prototype.divideFraction = function (sign) {
       (fract1.numer == 0 && fract1.whole == 0) ||
       (fract2.numer == 0 && fract2.whole == 0)
     ) {
-      console.log(that);
-      console.log(fract1, fract2);
-      console.log("ZERO");
+      // console.log(that);
+      // console.log(fract1, fract2);
+      // console.log("ZERO");
       return true;
     }
   }
